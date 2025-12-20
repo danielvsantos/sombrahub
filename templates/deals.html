@@ -70,6 +70,22 @@
                 </div>
             </div>
             
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Internal Cost ($)</span>
+                    </label>
+                    <input type="number" name="cost_internal" placeholder="0" step="0.01" min="0" class="input input-bordered bg-base-300/50" data-testid="input-cost-internal">
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">External Cost ($)</span>
+                    </label>
+                    <input type="number" name="cost_external" placeholder="0" step="0.01" min="0" class="input input-bordered bg-base-300/50" data-testid="input-cost-external">
+                </div>
+            </div>
+            
             <div class="form-control">
                 <label class="label cursor-pointer justify-start gap-3">
                     <input type="checkbox" name="is_recurring" class="checkbox checkbox-primary" data-testid="checkbox-recurring">
