@@ -374,12 +374,20 @@ def deal_detail(deal_id):
 def edit_deal(deal_id):
     deal = Deal.query.get_or_404(deal_id)
     
-    deal.title = request.form.get('title', deal.title)
+    old_title = deal.title
+    new_title = request.form.get('title', deal.title)
+    
+    deal.title = new_title
     deal.value = float(request.form.get('value', deal.value) or 0)
     deal.cost_internal = float(request.form.get('cost_internal', deal.cost_internal) or 0)
     deal.cost_external = float(request.form.get('cost_external', deal.cost_external) or 0)
     deal.is_recurring = request.form.get('is_recurring') == 'on'
     deal.notes = request.form.get('notes', '')
+    
+    if old_title != new_title:
+        linked_jobs = Job.query.filter_by(deal_id=deal_id, title=old_title).all()
+        for job in linked_jobs:
+            job.title = new_title
     
     db.session.commit()
     flash('Deal updated successfully!', 'success')
