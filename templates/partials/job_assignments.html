@@ -1,0 +1,28 @@
+{% if job.assignments %}
+<div class="space-y-2">
+    {% for assignment in job.assignments %}
+    <div class="flex items-center justify-between p-2 rounded-lg bg-base-300/30" data-testid="assignment-{{ assignment.id }}">
+        <div class="flex items-center gap-2">
+            <div class="avatar placeholder">
+                <div class="bg-purple-500/20 text-purple-400 rounded-full w-8">
+                    <span class="text-xs">{{ assignment.user.username[0].upper() }}</span>
+                </div>
+            </div>
+            <div>
+                <p class="text-sm font-medium">{{ assignment.user.full_name or assignment.user.username }}</p>
+                <p class="text-xs text-base-content/60">{{ assignment.role }}</p>
+            </div>
+        </div>
+        <form hx-post="{{ url_for('remove_job_assignment', assignment_id=assignment.id) }}" hx-target="#job-assignments" hx-swap="innerHTML">
+            <button type="submit" class="btn btn-ghost btn-xs text-error" data-testid="button-remove-{{ assignment.id }}">
+                <i class="fas fa-times"></i>
+            </button>
+        </form>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="text-center py-4 text-base-content/40">
+    <p class="text-sm">No team members assigned</p>
+</div>
+{% endif %}

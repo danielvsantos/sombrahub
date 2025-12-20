@@ -1,7 +1,7 @@
 {% if clients %}
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     {% for client in clients %}
-    <div class="card bg-base-200 shadow-lg hover:shadow-xl transition-shadow" data-testid="card-client-{{ client.id }}">
+    <a href="{{ url_for('client_detail', client_id=client.id) }}" class="card bg-base-200 shadow-lg hover:shadow-xl hover:border-purple-500/50 border border-transparent transition-all" data-testid="card-client-{{ client.id }}">
         <div class="card-body">
             <div class="flex items-start justify-between">
                 <div class="avatar placeholder">
@@ -44,7 +44,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </a>
     {% endfor %}
 </div>
 {% else %}

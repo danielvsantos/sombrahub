@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}User Management - CreativeHub{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+        <h1 class="text-3xl font-bold" data-testid="text-page-title">User Management</h1>
+        <p class="text-base-content/60 mt-1">Manage team members and photographers</p>
+    </div>
+    <button onclick="document.getElementById('add_user_modal').showModal()" class="btn btn-primary gap-2" data-testid="button-add-user">
+        <i class="fas fa-user-plus"></i>
+        Add User
+    </button>
+</div>
+
+<div id="users-list">
+    {% include "partials/users_list.html" %}
+</div>
+
+<dialog id="add_user_modal" class="modal">
+    <div class="modal-box bg-base-200 max-w-lg">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                <i class="fas fa-times"></i>
+            </button>
+        </form>
+        <h3 class="font-bold text-xl mb-6 flex items-center gap-2">
+            <i class="fas fa-user-plus text-purple-400"></i>
+            New User
+        </h3>
+        
+        <form hx-post="{{ url_for('add_user') }}" hx-target="#users-list" hx-swap="innerHTML" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Username</span>
+                    </label>
+                    <input type="text" name="username" placeholder="username" class="input input-bordered bg-base-300/50" required data-testid="input-username">
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Password</span>
+                    </label>
+                    <input type="password" name="password" placeholder="password" class="input input-bordered bg-base-300/50" required data-testid="input-password">
+                </div>
+            </div>
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Full Name</span>
+                </label>
+                <input type="text" name="full_name" placeholder="John Doe" class="input input-bordered bg-base-300/50" data-testid="input-fullname">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Email</span>
+                    </label>
+                    <input type="email" name="email" placeholder="user@agency.com" class="input input-bordered bg-base-300/50" data-testid="input-email">
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Role</span>
+                    </label>
+                    <select name="role" class="select select-bordered bg-base-300/50" data-testid="select-role">
+                        <option value="Photographer">Photographer</option>
+                        <option value="Admin">Admin</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="modal-action">
+                <button type="button" onclick="document.getElementById('add_user_modal').close()" class="btn btn-ghost">Cancel</button>
+                <button type="submit" class="btn btn-primary gap-2" onclick="document.getElementById('add_user_modal').close()" data-testid="button-submit-user">
+                    <i class="fas fa-check"></i>
+                    Create User
+                </button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+{% endblock %}

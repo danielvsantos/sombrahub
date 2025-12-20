@@ -1,0 +1,235 @@
+{% extends "base.html" %}
+
+{% block title %}{{ deal.title }} - CreativeHub{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{{ url_for('deals') }}" class="btn btn-ghost btn-sm gap-2 mb-4">
+        <i class="fas fa-arrow-left"></i>
+        Back to Deals
+    </a>
+    <div class="flex items-start justify-between">
+        <div>
+            <h1 class="text-3xl font-bold" data-testid="text-deal-title">{{ deal.title }}</h1>
+            <p class="text-base-content/60 mt-1">{{ deal.client.name }}</p>
+        </div>
+        <span class="badge badge-lg 
+            {% if deal.stage == 'New' %}badge-info
+            {% elif deal.stage == 'Proposal' %}badge-warning
+            {% elif deal.stage == 'Negotiation' %}badge-accent
+            {% elif deal.stage == 'Won' %}badge-success
+            {% else %}badge-error{% endif %}">
+            {{ deal.stage }}
+        </span>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="lg:col-span-2 space-y-6">
+        <div class="card bg-base-200 shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title text-lg mb-4">
+                    <i class="fas fa-edit text-purple-400"></i>
+                    Deal Details
+                </h2>
+                
+                <form action="{{ url_for('edit_deal', deal_id=deal.id) }}" method="POST" class="space-y-4">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Title</span>
+                        </label>
+                        <input type="text" name="title" value="{{ deal.title }}" class="input input-bordered bg-base-300/50" required data-testid="input-title">
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Deal Value ($)</span>
+                            </label>
+                            <input type="number" name="value" value="{{ deal.value }}" step="0.01" class="input input-bordered bg-base-300/50" data-testid="input-value">
+                        </div>
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Internal Cost ($)</span>
+                            </label>
+                            <input type="number" name="cost_internal" value="{{ deal.cost_internal }}" step="0.01" class="input input-bordered bg-base-300/50" data-testid="input-cost-internal">
+                        </div>
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">External Cost ($)</span>
+                            </label>
+                            <input type="number" name="cost_external" value="{{ deal.cost_external }}" step="0.01" class="input input-bordered bg-base-300/50" data-testid="input-cost-external">
+                        </div>
+                    </div>
+                    
+                    <div class="form-control">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" name="is_recurring" class="checkbox checkbox-primary" {% if deal.is_recurring %}checked{% endif %} data-testid="checkbox-recurring">
+                            <span class="label-text">Recurring/Retainer Deal</span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text">Notes</span>
+                        </label>
+                        <textarea name="notes" class="textarea textarea-bordered bg-base-300/50 min-h-24" data-testid="textarea-notes">{{ deal.notes or '' }}</textarea>
+                    </div>
+                    
+                    <div class="card-actions justify-end">
+                        <button type="submit" class="btn btn-primary gap-2" data-testid="button-save">
+                            <i class="fas fa-save"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card bg-base-200 shadow-lg">
+            <div class="card-body">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="card-title text-lg">
+                        <i class="fas fa-pie-chart text-green-400"></i>
+                        Profit Sharing
+                    </h2>
+                    <button onclick="document.getElementById('add_profit_share_modal').showModal()" class="btn btn-sm btn-primary gap-1" data-testid="button-add-share">
+                        <i class="fas fa-plus text-xs"></i>
+                        Add Share
+                    </button>
+                </div>
+                
+                <div id="profit-shares">
+                    {% include "partials/profit_shares.html" %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="space-y-6">
+        <div class="card bg-base-200 shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title text-lg mb-4">
+                    <i class="fas fa-calculator text-blue-400"></i>
+                    Financials
+                </h2>
+                
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center">
+                        <span class="text-base-content/60">Deal Value</span>
+                        <span class="font-bold text-lg">${{ "{:,.2f}".format(deal.value) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-base-content/60">Internal Cost</span>
+                        <span class="text-error">-${{ "{:,.2f}".format(deal.cost_internal) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-base-content/60">External Cost</span>
+                        <span class="text-error">-${{ "{:,.2f}".format(deal.cost_external) }}</span>
+                    </div>
+                    <div class="divider my-2"></div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-base-content/60">Total Cost</span>
+                        <span class="font-semibold">${{ "{:,.2f}".format(deal.total_cost) }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold">Net Profit</span>
+                        <span class="font-bold text-xl {% if deal.profit >= 0 %}text-success{% else %}text-error{% endif %}">
+                            ${{ "{:,.2f}".format(deal.profit) }}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-base-content/60">Margin</span>
+                        <span class="badge {% if deal.profit_margin >= 30 %}badge-success{% elif deal.profit_margin >= 15 %}badge-warning{% else %}badge-error{% endif %}">
+                            {{ "{:.1f}".format(deal.profit_margin) }}%
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if deal.jobs %}
+        <div class="card bg-base-200 shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title text-lg mb-4">
+                    <i class="fas fa-briefcase text-amber-400"></i>
+                    Related Jobs
+                </h2>
+                
+                <div class="space-y-2">
+                    {% for job in deal.jobs %}
+                    <a href="{{ url_for('job_detail', job_id=job.id) }}" class="block p-3 rounded-lg bg-base-300/50 hover:bg-base-300 transition-colors" data-testid="link-job-{{ job.id }}">
+                        <div class="flex items-center justify-between">
+                            <span class="font-medium">{{ job.display_title }}</span>
+                            <span class="badge badge-sm {% if job.status == 'Active' %}badge-primary{% else %}badge-success{% endif %}">
+                                {{ job.status }}
+                            </span>
+                        </div>
+                        <p class="text-xs text-base-content/60 mt-1">{{ job.deliverables|length }} deliverables</p>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<dialog id="add_profit_share_modal" class="modal">
+    <div class="modal-box bg-base-200 max-w-md">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                <i class="fas fa-times"></i>
+            </button>
+        </form>
+        <h3 class="font-bold text-xl mb-6 flex items-center gap-2">
+            <i class="fas fa-pie-chart text-green-400"></i>
+            Add Profit Share
+        </h3>
+        
+        <form hx-post="{{ url_for('add_profit_share', deal_id=deal.id) }}" hx-target="#profit-shares" hx-swap="innerHTML" class="space-y-4">
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Team Member</span>
+                </label>
+                <select name="user_id" class="select select-bordered bg-base-300/50" required data-testid="select-user">
+                    <option value="" disabled selected>Select a team member</option>
+                    {% for user in users %}
+                    <option value="{{ user.id }}">{{ user.full_name or user.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Percentage (%)</span>
+                    </label>
+                    <input type="number" name="percentage" value="0" step="0.1" min="0" max="100" class="input input-bordered bg-base-300/50" data-testid="input-percentage">
+                </div>
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Flat Amount ($)</span>
+                    </label>
+                    <input type="number" name="flat_amount" value="0" step="0.01" min="0" class="input input-bordered bg-base-300/50" data-testid="input-flat-amount">
+                </div>
+            </div>
+            
+            <p class="text-sm text-base-content/60">
+                Percentage is calculated from net profit (${{ "{:,.2f}".format(deal.profit) }})
+            </p>
+            
+            <div class="modal-action">
+                <button type="button" onclick="document.getElementById('add_profit_share_modal').close()" class="btn btn-ghost">Cancel</button>
+                <button type="submit" class="btn btn-primary gap-2" onclick="document.getElementById('add_profit_share_modal').close()" data-testid="button-submit-share">
+                    <i class="fas fa-check"></i>
+                    Add Share
+                </button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+{% endblock %}

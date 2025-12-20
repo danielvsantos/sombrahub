@@ -144,18 +144,30 @@
                         <i class="fas fa-home w-5 text-center"></i>
                         <span>Dashboard</span>
                     </a>
-                    <a href="{{ url_for('deals') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint == 'deals' }}" data-testid="link-deals">
+                    <a href="{{ url_for('deals') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint in ['deals', 'deal_detail'] }}" data-testid="link-deals">
                         <i class="fas fa-handshake w-5 text-center"></i>
                         <span>Deals</span>
                     </a>
-                    <a href="{{ url_for('production') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint == 'production' }}" data-testid="link-production">
+                    <a href="{{ url_for('production') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint in ['production', 'production_calendar', 'job_detail'] }}" data-testid="link-production">
                         <i class="fas fa-briefcase w-5 text-center"></i>
                         <span>Production</span>
                     </a>
-                    <a href="{{ url_for('clients') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint == 'clients' }}" data-testid="link-clients">
+                    <a href="{{ url_for('production_calendar') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint == 'production_calendar' }}" data-testid="link-calendar">
+                        <i class="fas fa-calendar-alt w-5 text-center"></i>
+                        <span>Calendar</span>
+                    </a>
+                    <a href="{{ url_for('clients') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint in ['clients', 'client_detail'] }}" data-testid="link-clients">
                         <i class="fas fa-users w-5 text-center"></i>
                         <span>Clients</span>
                     </a>
+                    
+                    {% if current_user.role == 'Admin' %}
+                    <div class="divider my-2 text-xs text-base-content/40">Admin</div>
+                    <a href="{{ url_for('users') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint in ['users', 'edit_user'] }}" data-testid="link-users">
+                        <i class="fas fa-user-cog w-5 text-center"></i>
+                        <span>Users</span>
+                    </a>
+                    {% endif %}
                 </nav>
                 
                 <div class="p-4 border-t border-base-300">

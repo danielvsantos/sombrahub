@@ -38,9 +38,9 @@
                     </div>
                 </div>
                 <div>
-                    <h3 class="font-semibold text-lg" data-testid="text-client-name-{{ job.id }}">{{ job.client.name }}</h3>
+                    <a href="{{ url_for('job_detail', job_id=job.id) }}" class="font-semibold text-lg hover:text-purple-400 transition-colors" data-testid="link-job-{{ job.id }}">{{ job.display_title }}</a>
                     <div class="flex items-center gap-2 mt-1">
-                        <span class="text-sm text-base-content/60">Started {{ job.start_date.strftime('%b %d, %Y') }}</span>
+                        <span class="text-sm text-base-content/60">{{ job.client.name }} - Started {{ job.start_date.strftime('%b %d, %Y') }}</span>
                         {% if job.is_retainer %}
                         <span class="badge badge-secondary badge-sm">
                             <i class="fas fa-sync-alt mr-1 text-xs"></i>

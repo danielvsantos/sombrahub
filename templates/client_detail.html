@@ -1,0 +1,274 @@
+{% extends "base.html" %}
+
+{% block title %}{{ client.name }} - CreativeHub{% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <a href="{{ url_for('clients') }}" class="btn btn-ghost btn-sm gap-2 mb-4">
+        <i class="fas fa-arrow-left"></i>
+        Back to Clients
+    </a>
+    <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div class="flex items-start gap-4">
+            <div class="avatar placeholder">
+                <div class="bg-gradient-to-br from-purple-500 to-blue-500 text-white rounded-xl w-16 h-16">
+                    <span class="text-2xl font-bold">{{ client.name[0] }}</span>
+                </div>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold" data-testid="text-client-name">{{ client.name }}</h1>
+                {% if client.industry %}
+                <span class="badge badge-ghost mt-1">{{ client.industry }}</span>
+                {% endif %}
+            </div>
+        </div>
+        <button onclick="document.getElementById('edit_client_modal').showModal()" class="btn btn-ghost gap-2" data-testid="button-edit-client">
+            <i class="fas fa-edit"></i>
+            Edit
+        </button>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <div class="space-y-6">
+        <div class="card bg-base-200 shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title text-lg mb-4">
+                    <i class="fas fa-address-card text-blue-400"></i>
+                    Contact Info
+                </h2>
+                
+                <div class="space-y-3 text-sm">
+                    {% if client.email %}
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-envelope text-base-content/40 w-4"></i>
+                        <a href="mailto:{{ client.email }}" class="text-primary hover:underline">{{ client.email }}</a>
+                    </div>
+                    {% endif %}
+                    {% if client.phone %}
+                    <div class="flex items-center gap-3">
+                        <i class="fas fa-phone text-base-content/40 w-4"></i>
+                        <span>{{ client.phone }}</span>
+                    </div>
+                    {% endif %}
+                    {% if client.address %}
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-map-marker-alt text-base-content/40 w-4 mt-1"></i>
+                        <span>{{ client.address }}</span>
+                    </div>
+                    {% endif %}
+                    {% if client.notes %}
+                    <div class="divider my-2"></div>
+                    <p class="text-base-content/60">{{ client.notes }}</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card bg-base-200 shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title text-lg mb-4">
+                    <i class="fas fa-chart-bar text-purple-400"></i>
+                    Stats
+                </h2>
+                
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-base-content/60">Total Deals</span>
+                        <span class="font-semibold">{{ client.deals|length }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-base-content/60">Active Jobs</span>
+                        <span class="font-semibold">{{ client.jobs|selectattr('status', 'equalto', 'Active')|list|length }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-base-content/60">Total Value</span>
+                        <span class="font-semibold text-success">${{ "{:,.0f}".format(client.deals|sum(attribute='value')) }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        {% if client.deals %}
+        <div class="card bg-base-200 shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title text-lg mb-4">
+                    <i class="fas fa-handshake text-green-400"></i>
+                    Deals
+                </h2>
+                
+                <div class="space-y-2">
+                    {% for deal in client.deals %}
+                    <a href="{{ url_for('deal_detail', deal_id=deal.id) }}" 
+                       class="block p-2 rounded-lg bg-base-300/50 hover:bg-base-300 transition-colors" 
+                       data-testid="link-deal-{{ deal.id }}">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium truncate">{{ deal.title }}</span>
+                            <span class="badge badge-sm 
+                                {% if deal.stage == 'Won' %}badge-success
+                                {% elif deal.stage == 'Lost' %}badge-error
+                                {% else %}badge-ghost{% endif %}">
+                                {{ deal.stage }}
+                            </span>
+                        </div>
+                        <p class="text-xs text-base-content/60 mt-1">${{ "{:,.0f}".format(deal.value) }}</p>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <div class="lg:col-span-3">
+        <div class="card bg-base-200 shadow-lg">
+            <div class="card-body">
+                <h2 class="card-title text-lg mb-4">
+                    <i class="fas fa-columns text-blue-400"></i>
+                    All Deliverables
+                </h2>
+                
+                {% if client.jobs %}
+                <div class="flex gap-4 overflow-x-auto pb-4">
+                    {% for status in statuses %}
+                    <div class="w-64 flex-shrink-0">
+                        <div class="bg-base-300/50 rounded-xl p-4 min-h-64">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold flex items-center gap-2 text-sm">
+                                    <span class="w-2 h-2 rounded-full 
+                                        {% if status == 'To Do' %}bg-gray-400
+                                        {% elif status == 'Shooting' %}bg-info
+                                        {% elif status == 'Editing' %}bg-warning
+                                        {% elif status == 'Review' %}bg-accent
+                                        {% else %}bg-success{% endif %}"></span>
+                                    {{ status }}
+                                </h3>
+                                <span class="badge badge-ghost badge-sm">{{ deliverables_by_status[status]|length }}</span>
+                            </div>
+                            
+                            <div class="space-y-2">
+                                {% for deliverable in deliverables_by_status[status] %}
+                                <a href="{{ url_for('job_detail', job_id=deliverable.job_id) }}" 
+                                   class="block bg-base-100 rounded-lg p-3 border border-base-300 hover:border-purple-500/50 transition-colors" 
+                                   data-testid="card-deliverable-{{ deliverable.id }}">
+                                    <p class="font-medium text-sm mb-1">{{ deliverable.title }}</p>
+                                    <p class="text-xs text-base-content/60">{{ deliverable.job.display_title }}</p>
+                                    
+                                    <div class="flex items-center justify-between text-xs mt-2">
+                                        {% if deliverable.assignee %}
+                                        <div class="flex items-center gap-1">
+                                            <div class="avatar placeholder">
+                                                <div class="bg-purple-500/20 text-purple-400 rounded-full w-5">
+                                                    <span class="text-xs">{{ deliverable.assignee.username[0].upper() }}</span>
+                                                </div>
+                                            </div>
+                                            <span class="text-base-content/60">{{ deliverable.assignee.username }}</span>
+                                        </div>
+                                        {% else %}
+                                        <span class="text-base-content/40">Unassigned</span>
+                                        {% endif %}
+                                        
+                                        {% if deliverable.due_date %}
+                                        <span class="{% if deliverable.due_date < today %}text-error{% else %}text-base-content/60{% endif %}">
+                                            {{ deliverable.due_date.strftime('%b %d') }}
+                                        </span>
+                                        {% endif %}
+                                    </div>
+                                </a>
+                                {% endfor %}
+                                
+                                {% if deliverables_by_status[status]|length == 0 %}
+                                <div class="text-center py-6 text-base-content/40">
+                                    <p class="text-xs">No items</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-12 text-base-content/40">
+                    <i class="fas fa-inbox text-4xl mb-3"></i>
+                    <p>No jobs or deliverables yet</p>
+                    <a href="{{ url_for('deals') }}" class="btn btn-primary btn-sm mt-4 gap-2">
+                        <i class="fas fa-plus"></i>
+                        Create a Deal
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<dialog id="edit_client_modal" class="modal">
+    <div class="modal-box bg-base-200 max-w-lg">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                <i class="fas fa-times"></i>
+            </button>
+        </form>
+        <h3 class="font-bold text-xl mb-6 flex items-center gap-2">
+            <i class="fas fa-edit text-blue-400"></i>
+            Edit Client
+        </h3>
+        
+        <form action="{{ url_for('edit_client', client_id=client.id) }}" method="POST" class="space-y-4">
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Name</span>
+                </label>
+                <input type="text" name="name" value="{{ client.name }}" class="input input-bordered bg-base-300/50" required data-testid="input-name">
+            </div>
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Industry</span>
+                </label>
+                <input type="text" name="industry" value="{{ client.industry or '' }}" class="input input-bordered bg-base-300/50" data-testid="input-industry">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Email</span>
+                    </label>
+                    <input type="email" name="email" value="{{ client.email or '' }}" class="input input-bordered bg-base-300/50" data-testid="input-email">
+                </div>
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Phone</span>
+                    </label>
+                    <input type="tel" name="phone" value="{{ client.phone or '' }}" class="input input-bordered bg-base-300/50" data-testid="input-phone">
+                </div>
+            </div>
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Address</span>
+                </label>
+                <textarea name="address" class="textarea textarea-bordered bg-base-300/50" data-testid="textarea-address">{{ client.address or '' }}</textarea>
+            </div>
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Notes</span>
+                </label>
+                <textarea name="notes" class="textarea textarea-bordered bg-base-300/50" data-testid="textarea-notes">{{ client.notes or '' }}</textarea>
+            </div>
+            
+            <div class="modal-action">
+                <button type="button" onclick="document.getElementById('edit_client_modal').close()" class="btn btn-ghost">Cancel</button>
+                <button type="submit" class="btn btn-primary gap-2" data-testid="button-save">
+                    <i class="fas fa-save"></i>
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+{% endblock %}

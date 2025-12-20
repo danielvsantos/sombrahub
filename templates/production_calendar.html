@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Production Calendar - CreativeHub{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+        <h1 class="text-3xl font-bold" data-testid="text-page-title">Production Calendar</h1>
+        <p class="text-base-content/60 mt-1">View deliverables by due date</p>
+    </div>
+    <div class="flex gap-2">
+        <a href="{{ url_for('production') }}" class="btn btn-ghost gap-2">
+            <i class="fas fa-list"></i>
+            List View
+        </a>
+    </div>
+</div>
+
+<div id="calendar-container">
+    {% include "partials/calendar_grid.html" %}
+</div>
+{% endblock %}

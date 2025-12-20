@@ -28,7 +28,7 @@
                         {% endif %}
                     </div>
                     
-                    <h4 class="font-medium text-sm mb-2">{{ deal.title }}</h4>
+                    <a href="{{ url_for('deal_detail', deal_id=deal.id) }}" class="font-medium text-sm mb-2 block hover:text-purple-400 transition-colors" data-testid="link-deal-{{ deal.id }}">{{ deal.title }}</a>
                     
                     <div class="flex items-center justify-between">
                         <span class="text-lg font-bold text-purple-400">${{ "{:,.0f}".format(deal.value) }}</span>
