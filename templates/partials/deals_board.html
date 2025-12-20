@@ -1,0 +1,81 @@
+<div class="flex gap-4 min-w-max">
+    {% for stage in stages %}
+    <div class="kanban-column w-72 flex-shrink-0">
+        <div class="bg-base-200 rounded-xl p-4 h-full">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="font-semibold flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full 
+                        {% if stage == 'New' %}bg-info
+                        {% elif stage == 'Proposal' %}bg-warning
+                        {% elif stage == 'Negotiation' %}bg-accent
+                        {% elif stage == 'Won' %}bg-success
+                        {% else %}bg-error{% endif %}"></span>
+                    {{ stage }}
+                </h3>
+                <span class="badge badge-ghost badge-sm" data-testid="badge-count-{{ stage|lower }}">{{ deals_by_stage[stage]|length }}</span>
+            </div>
+            
+            <div class="space-y-3" id="column-{{ stage|lower }}" data-testid="column-{{ stage|lower }}">
+                {% for deal in deals_by_stage[stage] %}
+                <div class="deal-card bg-base-100 rounded-lg p-4 border border-base-300 hover:border-purple-500/50" data-testid="card-deal-{{ deal.id }}">
+                    <div class="flex items-start justify-between gap-2 mb-2">
+                        <span class="text-xs text-base-content/60 bg-base-300 px-2 py-0.5 rounded">{{ deal.client.name }}</span>
+                        {% if deal.is_recurring %}
+                        <span class="badge badge-secondary badge-sm">
+                            <i class="fas fa-sync-alt mr-1 text-xs"></i>
+                            Retainer
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <h4 class="font-medium text-sm mb-2">{{ deal.title }}</h4>
+                    
+                    <div class="flex items-center justify-between">
+                        <span class="text-lg font-bold text-purple-400">${{ "{:,.0f}".format(deal.value) }}</span>
+                        
+                        {% if stage != 'Won' and stage != 'Lost' %}
+                        <div class="dropdown dropdown-end">
+                            <label tabindex="0" class="btn btn-ghost btn-xs" data-testid="button-move-{{ deal.id }}">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </label>
+                            <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow-lg bg-base-300 rounded-lg w-40">
+                                {% for target_stage in stages %}
+                                {% if target_stage != stage %}
+                                <li>
+                                    <form hx-post="{{ url_for('update_deal_stage', deal_id=deal.id) }}" hx-target="#deals-board" hx-swap="innerHTML">
+                                        <input type="hidden" name="stage" value="{{ target_stage }}">
+                                        <button type="submit" class="w-full text-left" data-testid="button-move-to-{{ target_stage|lower }}-{{ deal.id }}">
+                                            <span class="w-2 h-2 rounded-full inline-block mr-2
+                                                {% if target_stage == 'New' %}bg-info
+                                                {% elif target_stage == 'Proposal' %}bg-warning
+                                                {% elif target_stage == 'Negotiation' %}bg-accent
+                                                {% elif target_stage == 'Won' %}bg-success
+                                                {% else %}bg-error{% endif %}"></span>
+                                            {{ target_stage }}
+                                        </button>
+                                    </form>
+                                </li>
+                                {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if deal.notes %}
+                    <p class="text-xs text-base-content/50 mt-2 line-clamp-2">{{ deal.notes }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+                
+                {% if deals_by_stage[stage]|length == 0 %}
+                <div class="text-center py-8 text-base-content/40">
+                    <i class="fas fa-inbox text-2xl mb-2"></i>
+                    <p class="text-sm">No deals</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="night">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Creative Agency{% endblock %}</title>
+    <meta name="description" content="Creative Agency Management Platform - Sales CRM and Production Management">
+    
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        .sidebar-link {
+            transition: all 0.2s ease;
+        }
+        
+        .sidebar-link:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .sidebar-link.active {
+            background: rgba(138, 92, 246, 0.2);
+            border-left: 3px solid rgb(138, 92, 246);
+        }
+        
+        .deal-card {
+            transition: all 0.2s ease;
+            cursor: grab;
+        }
+        
+        .deal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .deal-card:active {
+            cursor: grabbing;
+        }
+        
+        .kanban-column {
+            min-height: 400px;
+        }
+        
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .accordion-content.open {
+            max-height: 1000px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(138, 92, 246, 0.1) 0%, rgba(59, 130, 246, 0.1) 100%);
+            border: 1px solid rgba(138, 92, 246, 0.2);
+        }
+        
+        .htmx-indicator {
+            display: none;
+        }
+        
+        .htmx-request .htmx-indicator {
+            display: inline-block;
+        }
+        
+        .htmx-request.htmx-indicator {
+            display: inline-block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .scrollbar-thin::-webkit-scrollbar-thumb {
+            background: rgba(138, 92, 246, 0.5);
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-base-100">
+    {% if current_user.is_authenticated %}
+    <div class="drawer lg:drawer-open">
+        <input id="sidebar-drawer" type="checkbox" class="drawer-toggle" />
+        
+        <div class="drawer-content flex flex-col">
+            <div class="navbar bg-base-200 border-b border-base-300 lg:hidden sticky top-0 z-50">
+                <div class="flex-none">
+                    <label for="sidebar-drawer" class="btn btn-square btn-ghost" data-testid="button-mobile-menu">
+                        <i class="fas fa-bars text-lg"></i>
+                    </label>
+                </div>
+                <div class="flex-1">
+                    <span class="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">CreativeHub</span>
+                </div>
+            </div>
+            
+            <main class="flex-1 p-4 lg:p-6 overflow-auto scrollbar-thin">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="mb-4 space-y-2">
+                            {% for category, message in messages %}
+                                <div class="alert alert-{{ 'success' if category == 'success' else 'error' if category == 'error' else 'info' }} shadow-lg fade-in" data-testid="alert-{{ category }}">
+                                    <i class="fas fa-{{ 'check-circle' if category == 'success' else 'exclamation-circle' if category == 'error' else 'info-circle' }}"></i>
+                                    <span>{{ message }}</span>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+                
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+        
+        <div class="drawer-side z-50">
+            <label for="sidebar-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+            <aside class="w-64 min-h-screen bg-base-200 border-r border-base-300 flex flex-col">
+                <div class="p-5 border-b border-base-300">
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent flex items-center gap-2">
+                        <i class="fas fa-camera-retro text-purple-400"></i>
+                        CreativeHub
+                    </h1>
+                    <p class="text-xs text-base-content/60 mt-1">Agency Management</p>
+                </div>
+                
+                <nav class="flex-1 p-4 space-y-1">
+                    <a href="{{ url_for('dashboard') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint == 'dashboard' }}" data-testid="link-dashboard">
+                        <i class="fas fa-home w-5 text-center"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="{{ url_for('deals') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint == 'deals' }}" data-testid="link-deals">
+                        <i class="fas fa-handshake w-5 text-center"></i>
+                        <span>Deals</span>
+                    </a>
+                    <a href="{{ url_for('production') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint == 'production' }}" data-testid="link-production">
+                        <i class="fas fa-briefcase w-5 text-center"></i>
+                        <span>Production</span>
+                    </a>
+                    <a href="{{ url_for('clients') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint == 'clients' }}" data-testid="link-clients">
+                        <i class="fas fa-users w-5 text-center"></i>
+                        <span>Clients</span>
+                    </a>
+                </nav>
+                
+                <div class="p-4 border-t border-base-300">
+                    <div class="flex items-center gap-3 mb-3 px-2">
+                        <div class="avatar placeholder">
+                            <div class="bg-purple-600 text-white rounded-full w-10">
+                                <span class="text-lg">{{ current_user.username[0].upper() }}</span>
+                            </div>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="font-medium text-sm truncate" data-testid="text-username">{{ current_user.username }}</p>
+                            <p class="text-xs text-base-content/60">{{ current_user.role }}</p>
+                        </div>
+                    </div>
+                    <a href="{{ url_for('logout') }}" class="btn btn-ghost btn-sm w-full justify-start gap-2 text-error hover:bg-error/10" data-testid="button-logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
+            </aside>
+        </div>
+    </div>
+    {% else %}
+    {% block public_content %}{% endblock %}
+    {% endif %}
+    
+    <script>
+        document.addEventListener('htmx:afterSwap', function(event) {
+            event.detail.elt.classList.add('fade-in');
+        });
+        
+        function toggleAccordion(id) {
+            const content = document.getElementById('accordion-content-' + id);
+            const icon = document.getElementById('accordion-icon-' + id);
+            
+            if (content.classList.contains('open')) {
+                content.classList.remove('open');
+                icon.classList.remove('rotate-180');
+            } else {
+                content.classList.add('open');
+                icon.classList.add('rotate-180');
+            }
+        }
+    </script>
+</body>
+</html>

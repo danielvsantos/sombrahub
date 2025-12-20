@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Clients - CreativeHub{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+        <h1 class="text-3xl font-bold" data-testid="text-page-title">Clients</h1>
+        <p class="text-base-content/60 mt-1">Manage your client database</p>
+    </div>
+    <button onclick="document.getElementById('add_client_modal').showModal()" class="btn btn-primary gap-2" data-testid="button-add-client">
+        <i class="fas fa-plus"></i>
+        Add Client
+    </button>
+</div>
+
+<div id="clients-list">
+    {% include "partials/clients_list.html" %}
+</div>
+
+<dialog id="add_client_modal" class="modal">
+    <div class="modal-box bg-base-200 max-w-lg">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                <i class="fas fa-times"></i>
+            </button>
+        </form>
+        <h3 class="font-bold text-xl mb-6 flex items-center gap-2">
+            <i class="fas fa-user-plus text-green-400"></i>
+            New Client
+        </h3>
+        
+        <form hx-post="{{ url_for('add_client') }}" hx-target="#clients-list" hx-swap="innerHTML" class="space-y-4">
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Client Name</span>
+                </label>
+                <input type="text" name="name" placeholder="Company or individual name" class="input input-bordered bg-base-300/50" required data-testid="input-client-name">
+            </div>
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Industry</span>
+                </label>
+                <input type="text" name="industry" placeholder="e.g., Technology, Fashion" class="input input-bordered bg-base-300/50" data-testid="input-industry">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Email</span>
+                    </label>
+                    <input type="email" name="email" placeholder="contact@example.com" class="input input-bordered bg-base-300/50" data-testid="input-email">
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Phone</span>
+                    </label>
+                    <input type="tel" name="phone" placeholder="555-0100" class="input input-bordered bg-base-300/50" data-testid="input-phone">
+                </div>
+            </div>
+            
+            <div class="modal-action">
+                <button type="button" onclick="document.getElementById('add_client_modal').close()" class="btn btn-ghost">Cancel</button>
+                <button type="submit" class="btn btn-primary gap-2" onclick="document.getElementById('add_client_modal').close()" data-testid="button-submit-client">
+                    <i class="fas fa-check"></i>
+                    Add Client
+                </button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+{% endblock %}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="night">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - CreativeHub</title>
+    <meta name="description" content="Login to CreativeHub - Creative Agency Management Platform">
+    
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        
+        .login-bg {
+            background: radial-gradient(ellipse at top right, rgba(138, 92, 246, 0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at bottom left, rgba(59, 130, 246, 0.15) 0%, transparent 50%);
+        }
+        
+        .glass-card {
+            background: rgba(28, 28, 38, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-base-100 login-bg flex items-center justify-center p-4">
+    <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-20 left-10 w-72 h-72 bg-purple-500/10 rounded-full blur-3xl float-animation"></div>
+        <div class="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl float-animation" style="animation-delay: -3s;"></div>
+    </div>
+    
+    <div class="w-full max-w-md relative z-10">
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl shadow-lg shadow-purple-500/25 mb-4">
+                <i class="fas fa-camera-retro text-3xl text-white"></i>
+            </div>
+            <h1 class="text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">CreativeHub</h1>
+            <p class="text-base-content/60 mt-2">Agency Management Platform</p>
+        </div>
+        
+        <div class="glass-card rounded-2xl p-8 shadow-2xl">
+            <h2 class="text-xl font-semibold text-center mb-6">Welcome back</h2>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ 'error' if category == 'error' else 'info' }} mb-4" data-testid="alert-login">
+                            <i class="fas fa-{{ 'exclamation-circle' if category == 'error' else 'info-circle' }}"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <form method="POST" action="{{ url_for('login') }}" class="space-y-5">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text text-base-content/70">Username</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        <input type="text" name="username" placeholder="Enter your username" 
+                               class="input input-bordered w-full pl-11 bg-base-300/50 border-base-content/10 focus:border-purple-500" 
+                               required data-testid="input-username">
+                    </div>
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text text-base-content/70">Password</span>
+                    </label>
+                    <div class="relative">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-base-content/40">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password" name="password" placeholder="Enter your password" 
+                               class="input input-bordered w-full pl-11 bg-base-300/50 border-base-content/10 focus:border-purple-500" 
+                               required data-testid="input-password">
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary w-full gap-2 shadow-lg shadow-purple-500/25" data-testid="button-login">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Sign In
+                </button>
+            </form>
+            
+            <div class="divider text-base-content/40 text-sm mt-6">Demo Credentials</div>
+            
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div class="bg-base-300/30 rounded-lg p-3 text-center">
+                    <p class="text-base-content/60 text-xs mb-1">Admin</p>
+                    <p class="font-mono text-purple-400">admin / admin</p>
+                </div>
+                <div class="bg-base-300/30 rounded-lg p-3 text-center">
+                    <p class="text-base-content/60 text-xs mb-1">Photographer</p>
+                    <p class="font-mono text-blue-400">alex / alex123</p>
+                </div>
+            </div>
+        </div>
+        
+        <p class="text-center text-base-content/40 text-sm mt-6">
+            Sales CRM + Production Management
+        </p>
+    </div>
+</body>
+</html>

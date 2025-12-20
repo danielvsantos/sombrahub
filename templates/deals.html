@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Deals Board - CreativeHub{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+    <div>
+        <h1 class="text-3xl font-bold" data-testid="text-page-title">Deals Board</h1>
+        <p class="text-base-content/60 mt-1">Manage your sales pipeline</p>
+    </div>
+    <button onclick="document.getElementById('add_deal_modal').showModal()" class="btn btn-primary gap-2" data-testid="button-add-deal">
+        <i class="fas fa-plus"></i>
+        Add Deal
+    </button>
+</div>
+
+<div id="deals-board" class="overflow-x-auto pb-4">
+    {% include "partials/deals_board.html" %}
+</div>
+
+<dialog id="add_deal_modal" class="modal">
+    <div class="modal-box bg-base-200 max-w-lg">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2" data-testid="button-close-modal">
+                <i class="fas fa-times"></i>
+            </button>
+        </form>
+        <h3 class="font-bold text-xl mb-6 flex items-center gap-2">
+            <i class="fas fa-handshake text-purple-400"></i>
+            New Deal
+        </h3>
+        
+        <form hx-post="{{ url_for('add_deal') }}" hx-target="#deals-board" hx-swap="innerHTML" class="space-y-4">
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Client</span>
+                </label>
+                <select name="client_id" class="select select-bordered w-full bg-base-300/50" required data-testid="select-client">
+                    <option value="" disabled selected>Select a client</option>
+                    {% for client in clients %}
+                    <option value="{{ client.id }}">{{ client.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Deal Title</span>
+                </label>
+                <input type="text" name="title" placeholder="e.g., Spring Photoshoot" class="input input-bordered bg-base-300/50" required data-testid="input-deal-title">
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Value ($)</span>
+                    </label>
+                    <input type="number" name="value" placeholder="0" step="0.01" min="0" class="input input-bordered bg-base-300/50" data-testid="input-deal-value">
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Stage</span>
+                    </label>
+                    <select name="stage" class="select select-bordered bg-base-300/50" data-testid="select-stage">
+                        <option value="New">New</option>
+                        <option value="Proposal">Proposal</option>
+                        <option value="Negotiation">Negotiation</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-control">
+                <label class="label cursor-pointer justify-start gap-3">
+                    <input type="checkbox" name="is_recurring" class="checkbox checkbox-primary" data-testid="checkbox-recurring">
+                    <span class="label-text">Recurring/Retainer Deal</span>
+                </label>
+            </div>
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Notes</span>
+                </label>
+                <textarea name="notes" class="textarea textarea-bordered bg-base-300/50 min-h-24" placeholder="Additional details..." data-testid="textarea-notes"></textarea>
+            </div>
+            
+            <div class="modal-action">
+                <button type="button" onclick="document.getElementById('add_deal_modal').close()" class="btn btn-ghost" data-testid="button-cancel">Cancel</button>
+                <button type="submit" class="btn btn-primary gap-2" onclick="document.getElementById('add_deal_modal').close()" data-testid="button-submit-deal">
+                    <i class="fas fa-check"></i>
+                    Create Deal
+                </button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+{% endblock %}

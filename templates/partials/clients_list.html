@@ -1,0 +1,62 @@
+{% if clients %}
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {% for client in clients %}
+    <div class="card bg-base-200 shadow-lg hover:shadow-xl transition-shadow" data-testid="card-client-{{ client.id }}">
+        <div class="card-body">
+            <div class="flex items-start justify-between">
+                <div class="avatar placeholder">
+                    <div class="bg-gradient-to-br from-purple-500 to-blue-500 text-white rounded-xl w-12 h-12">
+                        <span class="text-xl font-bold">{{ client.name[0] }}</span>
+                    </div>
+                </div>
+                {% if client.industry %}
+                <span class="badge badge-ghost text-xs">{{ client.industry }}</span>
+                {% endif %}
+            </div>
+            
+            <h3 class="card-title text-lg mt-3">{{ client.name }}</h3>
+            
+            <div class="space-y-2 mt-2 text-sm">
+                {% if client.email %}
+                <div class="flex items-center gap-2 text-base-content/60">
+                    <i class="fas fa-envelope w-4 text-center"></i>
+                    <span>{{ client.email }}</span>
+                </div>
+                {% endif %}
+                {% if client.phone %}
+                <div class="flex items-center gap-2 text-base-content/60">
+                    <i class="fas fa-phone w-4 text-center"></i>
+                    <span>{{ client.phone }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="card-actions mt-4 pt-4 border-t border-base-300">
+                <div class="flex items-center gap-4 text-sm text-base-content/60">
+                    <span>
+                        <i class="fas fa-handshake mr-1"></i>
+                        {{ client.deals|length }} deals
+                    </span>
+                    <span>
+                        <i class="fas fa-briefcase mr-1"></i>
+                        {{ client.jobs|length }} jobs
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card bg-base-200 shadow-lg">
+    <div class="card-body items-center text-center py-12">
+        <i class="fas fa-users text-5xl text-base-content/30 mb-4"></i>
+        <h3 class="text-xl font-semibold text-base-content/60">No clients yet</h3>
+        <p class="text-base-content/40">Add your first client to get started</p>
+        <button onclick="document.getElementById('add_client_modal').showModal()" class="btn btn-primary mt-4 gap-2">
+            <i class="fas fa-plus"></i>
+            Add Client
+        </button>
+    </div>
+</div>
+{% endif %}
