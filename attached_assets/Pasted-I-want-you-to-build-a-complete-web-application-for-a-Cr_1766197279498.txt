@@ -1,0 +1,69 @@
+I want you to build a complete web application for a Creative Agency Management Platform. 
+
+**Role:** Act as a Senior Python Full-Stack Developer.
+**Goal:** Build a functional MVP that couples Sales (CRM) with Production (Project Management).
+
+### 1. The Tech Stack (Replit Native)
+- **Backend:** Python with Flask.
+- **Database:** SQLite (using SQLAlchemy ORM) - Keep it simple for now, manageable in one file if possible or standard `models.py`.
+- **Frontend:** Server-side rendered HTML (Jinja2).
+- **Styling:** TailwindCSS + DaisyUI (imported via CDN). Do not set up a Node/NPM build step.
+- **Interactivity:** HTMX (imported via CDN) for seamless updates (drag-and-drop, status changes).
+- **Icons:** FontAwesome (via CDN).
+- **Auth:** Flask-Login for simple user authentication.
+
+### 2. Data Models (SQLAlchemy)
+Please implement the following relationships:
+
+1. **User**
+   - `id`, `username`, `password_hash`, `role` (Admin or Photographer).
+
+2. **Client**
+   - `id`, `name`, `industry`, `email`, `phone`.
+
+3. **Deal** (The Sales Opportunity)
+   - `id`, `client_id` (ForeignKey), `title`, `value` (Float), `stage` (String: 'New', 'Proposal', 'Negotiation', 'Won', 'Lost'), `is_recurring` (Boolean - *Critical*), `notes` (Text).
+
+4. **Job** (The Active Project)
+   - `id`, `client_id` (ForeignKey), `deal_id` (ForeignKey), `status` (String: 'Active', 'Completed'), `start_date`, `is_retainer` (Boolean).
+
+5. **Deliverable** (The Specific Task)
+   - `id`, `job_id` (ForeignKey), `title` (e.g., "5 Photos"), `status` (String: 'To Do', 'Shooting', 'Editing', 'Review', 'Done'), `assignee_id` (ForeignKey to User), `due_date`.
+
+### 3. Core Features & Business Logic
+
+**A. Authentication**
+- Create a simple Login page.
+- Seed the database with one Admin user (user: `admin`, pass: `admin`) and two Photographers.
+
+**B. The Deals Board (Sales CRM)**
+- Route: `/deals`
+- View: A Kanban board with columns for the stages.
+- Logic: When a Deal is moved to "Won":
+  - Automatically create a `Job` record linked to that Client.
+  - If `is_recurring` is True, mark the Job as a Retainer.
+
+**C. The Production Dashboard**
+- Route: `/production`
+- View: A list of active Jobs. 
+- UI: Use DaisyUI Accordions. 
+  - The "Header" of the accordion is the Client Name/Job Status.
+  - When expanded, show a table of `Deliverables` associated with that job.
+
+**D. Deliverable Management**
+- Allow users to add Deliverables to a Job.
+- Allow users to change the status of a Deliverable (e.g., from "Shooting" to "Editing") using a dropdown.
+
+### 4. UI/Design Requirements
+- Use a dark/modern theme (DaisyUI `dark` theme).
+- Sidebar navigation: Links to Dashboard, Deals, Production, Logout.
+- Use colorful badges for Statuses (e.g., Green for 'Won', Yellow for 'Negotiation').
+
+### 5. Implementation Instructions
+1. Setup the Flask app structure.
+2. Create `models.py` with the schema above.
+3. Create `routes.py` with the logic.
+4. Create a `templates/` folder with `base.html` (including CDNs) and child templates for the pages.
+5. Provide a script or route to initialize/seed the database with dummy data so I can test it immediately.
+
+Start by setting up the file structure and the database models.
