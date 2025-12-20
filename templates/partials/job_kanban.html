@@ -42,9 +42,9 @@
                     </div>
                     
                     <div class="flex items-center justify-between mt-2 pt-2 border-t border-base-300">
-                        <form hx-post="{{ url_for('update_deliverable_status', deliverable_id=deliverable.id) }}" hx-target="#job-kanban" hx-swap="innerHTML" class="flex-1">
+                        <form hx-post="{{ url_for('update_deliverable_status', deliverable_id=deliverable.id) }}" hx-target="#job-kanban" hx-swap="innerHTML" hx-trigger="change from:select" class="flex-1">
                             <input type="hidden" name="redirect_to" value="job_detail">
-                            <select name="status" class="select select-ghost select-xs w-full" onchange="this.form.submit()" data-testid="select-status-{{ deliverable.id }}">
+                            <select name="status" class="select select-ghost select-xs w-full" data-testid="select-status-{{ deliverable.id }}">
                                 {% for s in statuses %}
                                 <option value="{{ s }}" {% if deliverable.status == s %}selected{% endif %}>{{ s }}</option>
                                 {% endfor %}

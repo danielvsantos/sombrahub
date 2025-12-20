@@ -385,7 +385,7 @@ def edit_deal(deal_id):
     deal.notes = request.form.get('notes', '')
     
     if old_title != new_title:
-        linked_jobs = Job.query.filter_by(deal_id=deal_id, title=old_title).all()
+        linked_jobs = Job.query.filter_by(deal_id=deal_id).all()
         for job in linked_jobs:
             job.title = new_title
     
