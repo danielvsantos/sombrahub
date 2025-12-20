@@ -257,6 +257,15 @@ def edit_user(user_id):
     user = User.query.get_or_404(user_id)
     
     if request.method == 'POST':
+        new_username = request.form.get('username', user.username)
+        
+        if new_username != user.username:
+            existing_user = User.query.filter_by(username=new_username).first()
+            if existing_user:
+                flash('Username already exists.', 'error')
+                return redirect(url_for('edit_user', user_id=user_id))
+            user.username = new_username
+        
         user.full_name = request.form.get('full_name', '')
         user.email = request.form.get('email', '')
         user.role = request.form.get('role', 'Photographer')

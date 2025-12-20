@@ -22,16 +22,28 @@
                     </div>
                 </div>
                 <div>
-                    <h2 class="text-xl font-bold">{{ user.username }}</h2>
+                    <h2 class="text-xl font-bold">{{ user.full_name or user.username }}</h2>
                     <p class="text-base-content/60">@{{ user.username }}</p>
                 </div>
             </div>
             
-            <div class="form-control">
-                <label class="label">
-                    <span class="label-text">Full Name</span>
-                </label>
-                <input type="text" name="full_name" value="{{ user.full_name or '' }}" placeholder="John Doe" class="input input-bordered bg-base-300/50" data-testid="input-fullname">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Username (Handle)</span>
+                    </label>
+                    <div class="input-group">
+                        <span class="bg-base-300 px-3 flex items-center">@</span>
+                        <input type="text" name="username" value="{{ user.username }}" placeholder="username" class="input input-bordered bg-base-300/50 flex-1" required data-testid="input-username">
+                    </div>
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Display Name</span>
+                    </label>
+                    <input type="text" name="full_name" value="{{ user.full_name or '' }}" placeholder="John Doe" class="input input-bordered bg-base-300/50" data-testid="input-fullname">
+                </div>
             </div>
             
             <div class="grid grid-cols-2 gap-4">
