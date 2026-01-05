@@ -182,12 +182,12 @@
                         <span>Dashboard</span>
                     </a>
                     <a href="{{ url_for('deals') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint in ['deals', 'deal_detail'] }}" data-testid="link-deals">
-                        <i class="fas fa-handshake w-5 text-center"></i>
-                        <span>Deals</span>
+                        <i class="fas fa-file-invoice-dollar w-5 text-center"></i>
+                        <span>Proposals</span>
                     </a>
-                    <a href="{{ url_for('production') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint in ['production', 'production_calendar', 'job_detail'] }}" data-testid="link-production">
+                    <a href="{{ url_for('production') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint in ['production', 'job_detail'] }}" data-testid="link-production">
                         <i class="fas fa-briefcase w-5 text-center"></i>
-                        <span>Production</span>
+                        <span>Jobs</span>
                     </a>
                     <a href="{{ url_for('production_calendar') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint == 'production_calendar' }}" data-testid="link-calendar">
                         <i class="fas fa-calendar-alt w-5 text-center"></i>

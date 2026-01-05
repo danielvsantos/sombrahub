@@ -206,6 +206,11 @@ def dashboard():
         Deliverable.due_date != None
     ).order_by(Deliverable.due_date).limit(5).all()
     
+    my_tasks = Deliverable.query.filter(
+        Deliverable.assignee_id == current_user.id,
+        Deliverable.status != 'Done'
+    ).order_by(Deliverable.due_date.asc().nullslast()).limit(5).all()
+    
     won_deals_value = db.session.query(db.func.sum(Deal.value)).filter_by(stage='Won').scalar() or 0
     total_profit = db.session.query(
         db.func.sum(Deal.value - Deal.cost_internal - Deal.cost_external)
@@ -217,6 +222,7 @@ def dashboard():
                          pending_deliverables=pending_deliverables,
                          recent_deals=recent_deals,
                          upcoming_deliverables=upcoming_deliverables,
+                         my_tasks=my_tasks,
                          won_deals_value=won_deals_value,
                          total_profit=total_profit,
                          today=date.today())
