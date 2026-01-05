@@ -1,8 +1,8 @@
-# CreativeHub - Creative Agency Management Platform
+# Sombra Hub - Sombra Lab Agency Management Platform
 
 ## Overview
 
-CreativeHub is a full-stack web application for managing a creative agency's sales and production workflows. It combines a Sales CRM (deals board) with Production Management (jobs and deliverables tracking).
+Sombra Hub is a full-stack web application for managing Sombra Lab's sales and production workflows. It combines a Sales CRM (deals board) with Production Management (jobs and deliverables tracking).
 
 **Tech Stack:**
 - Backend: Python Flask with SQLAlchemy ORM
