@@ -6,7 +6,7 @@ CreativeHub is a full-stack web application for managing a creative agency's sal
 
 **Tech Stack:**
 - Backend: Python Flask with SQLAlchemy ORM
-- Database: SQLite
+- Database: PostgreSQL (Replit built-in, with separate dev/prod databases)
 - Frontend: Server-side rendered HTML with Jinja2 templates
 - Styling: TailwindCSS + DaisyUI (dark theme via CDN)
 - Interactivity: HTMX for dynamic updates without page reloads
@@ -131,3 +131,46 @@ python app.py
 - Subtle animations and transitions
 - Responsive layout with mobile sidebar drawer
 - HTMX for seamless dynamic updates
+
+## Development & Production Workflow
+
+This application uses Replit's built-in PostgreSQL database system, which provides **separate development and production databases** automatically.
+
+### How It Works
+
+1. **Development Database**: Used when running the app in the Replit editor (via `python app.py`). This is where you make changes and test new features.
+
+2. **Production Database**: Created automatically when you publish/deploy the app. Production users work with this database, which is isolated from development.
+
+### Workflow for Making Changes
+
+1. **Develop & Test**: Make code changes in the editor. The development database is automatically seeded with demo data on first run.
+
+2. **Test Locally**: Use the development preview to verify your changes work correctly with the demo credentials:
+   - Admin: `admin` / `admin`
+   - Photographer: `alex` / `alex123`
+
+3. **Publish to Production**: When ready, click "Deploy" or "Publish" to push your changes live. New tables will be created automatically; column changes require manual migration.
+
+4. **Database Isolation**: Changes you make in development (adding test data, etc.) do NOT affect production users. They have their own separate database.
+
+### Database Schema Changes
+
+- The app uses `db.create_all()` which creates new tables but does NOT modify existing tables
+- Adding new models (tables): Will be created automatically on deployment
+- Adding new columns to existing tables: Requires manual SQL migration via the Database panel
+- Removing columns/tables: Requires manual SQL migration and user coordination
+
+**For column changes**, use the Database panel to run SQL like:
+```sql
+ALTER TABLE "user" ADD COLUMN new_field VARCHAR(100);
+```
+
+### Rolling Back
+
+Replit provides point-in-time restore for production databases if you need to recover from a bad deployment. Access this through the Database panel in the Replit interface.
+
+### Environment Variables
+
+- `DATABASE_URL`: Automatically set by Replit for PostgreSQL connection
+- `SESSION_SECRET`: Should be set in Secrets for secure session management
