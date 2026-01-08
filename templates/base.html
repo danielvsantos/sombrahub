@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="night">
+<html lang="en" data-theme="corporate">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,21 +12,33 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
+        :root {
+            --p: 0 0% 0%;
+            --pc: 0 0% 100%;
+            --s: 0 0% 20%;
+            --sc: 0 0% 100%;
+            --a: 0 0% 30%;
+            --ac: 0 0% 100%;
+        }
+        
         body {
-            background-color: #0a0a0a;
+            background-color: #f8f9fa;
         }
         
         .sidebar-link {
             transition: all 0.2s ease;
+            color: rgba(255, 255, 255, 0.7);
         }
         
         .sidebar-link:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
         }
         
         .sidebar-link.active {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.15);
             border-left: 3px solid rgb(255, 255, 255);
+            color: white;
         }
         
         .deal-card {
@@ -36,7 +48,7 @@
         
         .deal-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
         
         .deal-card:active {
@@ -58,8 +70,8 @@
         }
         
         .stat-card {
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.02) 0%, rgba(0, 0, 0, 0.01) 100%);
+            border: 1px solid rgba(0, 0, 0, 0.08);
         }
         
         .htmx-indicator {
@@ -88,45 +100,39 @@
         }
         
         .scrollbar-thin::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.05);
         }
         
         .scrollbar-thin::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(0, 0, 0, 0.2);
             border-radius: 3px;
         }
         
-        .bg-base-100, .bg-base-200, .bg-base-300 {
-            background-color: #0a0a0a !important;
-        }
-        
         .drawer-side .menu {
-            background-color: #0f0f0f;
+            background-color: #ffffff;
         }
         
-        .card {
-            background-color: #111 !important;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        
-        .navbar {
-            background-color: #0f0f0f !important;
-            border-color: rgba(255, 255, 255, 0.08) !important;
+        .sidebar-bg {
+            background-color: #1a1a1a;
         }
         
         .btn-primary {
-            background-color: white !important;
-            color: black !important;
+            background-color: #1a1a1a !important;
+            color: white !important;
             border: none !important;
         }
         
         .btn-primary:hover {
-            background-color: #e5e5e5 !important;
+            background-color: #333 !important;
         }
         
         .badge-primary {
-            background-color: white !important;
-            color: black !important;
+            background-color: #1a1a1a !important;
+            color: white !important;
+        }
+        
+        .text-brand {
+            color: #1a1a1a;
         }
     </style>
 </head>
@@ -136,14 +142,14 @@
         <input id="sidebar-drawer" type="checkbox" class="drawer-toggle" />
         
         <div class="drawer-content flex flex-col">
-            <div class="navbar bg-base-200 border-b border-base-300 lg:hidden sticky top-0 z-50">
+            <div class="navbar bg-white border-b border-gray-200 lg:hidden sticky top-0 z-50">
                 <div class="flex-none">
                     <label for="sidebar-drawer" class="btn btn-square btn-ghost" data-testid="button-mobile-menu">
                         <i class="fas fa-bars text-lg"></i>
                     </label>
                 </div>
                 <div class="flex-1">
-                    <span class="text-xl font-bold text-white">Sombra Hub</span>
+                    <span class="text-xl font-bold text-gray-900">Sombra Hub</span>
                 </div>
             </div>
             
@@ -167,13 +173,13 @@
         
         <div class="drawer-side z-50">
             <label for="sidebar-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-            <aside class="w-64 min-h-screen bg-base-200 border-r border-base-300 flex flex-col">
-                <div class="p-5 border-b border-white/10">
+            <aside class="w-64 min-h-screen bg-gray-900 border-r border-gray-800 flex flex-col">
+                <div class="p-5 border-b border-gray-800">
                     <h1 class="text-2xl font-bold text-white flex items-center gap-2">
                         <i class="fas fa-bolt text-white"></i>
                         Sombra Hub
                     </h1>
-                    <p class="text-xs text-white/50 mt-1">Sombra Lab</p>
+                    <p class="text-xs text-gray-400 mt-1">Sombra Lab</p>
                 </div>
                 
                 <nav class="flex-1 p-4 space-y-1">
@@ -215,7 +221,7 @@
                     {% endif %}
                 </nav>
                 
-                <div class="p-4 border-t border-white/10">
+                <div class="p-4 border-t border-gray-800">
                     <div class="flex items-center gap-3 mb-3 px-2">
                         <div class="avatar placeholder">
                             <div class="bg-white text-black rounded-full w-10">
@@ -223,11 +229,11 @@
                             </div>
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="font-medium text-sm truncate" data-testid="text-username">{{ current_user.username }}</p>
-                            <p class="text-xs text-base-content/60">{{ current_user.role }}</p>
+                            <p class="font-medium text-sm truncate text-white" data-testid="text-username">{{ current_user.username }}</p>
+                            <p class="text-xs text-gray-400">{{ current_user.role }}</p>
                         </div>
                     </div>
-                    <a href="{{ url_for('logout') }}" class="btn btn-ghost btn-sm w-full justify-start gap-2 text-error hover:bg-error/10" data-testid="button-logout">
+                    <a href="{{ url_for('logout') }}" class="btn btn-ghost btn-sm w-full justify-start gap-2 text-red-400 hover:bg-red-500/10" data-testid="button-logout">
                         <i class="fas fa-sign-out-alt"></i>
                         Logout
                     </a>
@@ -401,111 +407,194 @@
             }
         }
         
-        // Drag and Drop for Kanban
+        // Reusable Drag and Drop for Kanban Boards
         let draggedCard = null;
-        let kanbanDragDropInitialized = false;
         
-        function initKanbanDragDrop() {
-            const kanbanContainer = document.getElementById('job-kanban');
-            if (!kanbanContainer) return;
+        function initKanbanBoard(config) {
+            const container = document.getElementById(config.containerId);
+            if (!container) return;
             
             // Prevent duplicate listeners
-            if (kanbanContainer.dataset.dragDropInit === 'true') return;
-            kanbanContainer.dataset.dragDropInit = 'true';
+            if (container.dataset.dragDropInit === 'true') return;
+            container.dataset.dragDropInit = 'true';
             
-            // Use event delegation for drag events
-            kanbanContainer.addEventListener('dragstart', function(e) {
-                if (e.target.classList.contains('kanban-card')) {
+            const cardClass = config.cardClass || 'kanban-card';
+            const columnClass = config.columnClass || 'kanban-cards';
+            const highlightClass = config.highlightClass || 'bg-gray-900/10 border-2 border-dashed border-gray-500';
+            
+            container.addEventListener('dragstart', function(e) {
+                if (e.target.classList.contains(cardClass)) {
                     draggedCard = e.target;
                     e.target.classList.add('opacity-50');
                     e.dataTransfer.effectAllowed = 'move';
-                    e.dataTransfer.setData('text/plain', e.target.dataset.deliverableId);
+                    e.dataTransfer.setData('text/plain', e.target.dataset.itemId || e.target.dataset.deliverableId || e.target.dataset.dealId);
                 }
             });
             
-            kanbanContainer.addEventListener('dragend', function(e) {
-                if (e.target.classList.contains('kanban-card')) {
+            container.addEventListener('dragend', function(e) {
+                if (e.target.classList.contains(cardClass)) {
                     e.target.classList.remove('opacity-50');
                     draggedCard = null;
-                    // Remove all drag-over styling
-                    document.querySelectorAll('.kanban-cards').forEach(col => {
-                        col.classList.remove('bg-purple-500/10', 'border-2', 'border-dashed', 'border-purple-500/50');
+                    container.querySelectorAll('.' + columnClass).forEach(col => {
+                        highlightClass.split(' ').forEach(c => col.classList.remove(c));
                     });
                 }
             });
             
-            kanbanContainer.addEventListener('dragover', function(e) {
-                const dropZone = e.target.closest('.kanban-cards');
+            container.addEventListener('dragover', function(e) {
+                const dropZone = e.target.closest('.' + columnClass);
                 if (dropZone && draggedCard) {
                     e.preventDefault();
                     e.dataTransfer.dropEffect = 'move';
-                    dropZone.classList.add('bg-purple-500/10', 'border-2', 'border-dashed', 'border-purple-500/50');
+                    highlightClass.split(' ').forEach(c => dropZone.classList.add(c));
                 }
             });
             
-            kanbanContainer.addEventListener('dragleave', function(e) {
-                const dropZone = e.target.closest('.kanban-cards');
+            container.addEventListener('dragleave', function(e) {
+                const dropZone = e.target.closest('.' + columnClass);
                 if (dropZone && !dropZone.contains(e.relatedTarget)) {
-                    dropZone.classList.remove('bg-purple-500/10', 'border-2', 'border-dashed', 'border-purple-500/50');
+                    highlightClass.split(' ').forEach(c => dropZone.classList.remove(c));
                 }
             });
             
-            kanbanContainer.addEventListener('drop', async function(e) {
-                const dropZone = e.target.closest('.kanban-cards');
+            container.addEventListener('drop', async function(e) {
+                const dropZone = e.target.closest('.' + columnClass);
                 if (dropZone && draggedCard) {
                     e.preventDefault();
-                    dropZone.classList.remove('bg-purple-500/10', 'border-2', 'border-dashed', 'border-purple-500/50');
+                    highlightClass.split(' ').forEach(c => dropZone.classList.remove(c));
                     
-                    const deliverableId = draggedCard.dataset.deliverableId;
-                    const newStatus = dropZone.dataset.status;
-                    const currentStatus = draggedCard.closest('.kanban-cards').dataset.status;
+                    const newStatus = dropZone.dataset.status || dropZone.dataset.stage;
+                    const currentColumn = draggedCard.closest('.' + columnClass);
+                    const currentStatus = currentColumn.dataset.status || currentColumn.dataset.stage;
                     
                     if (newStatus !== currentStatus) {
-                        // Move card visually first
                         dropZone.appendChild(draggedCard);
                         
-                        // Update status via POST
-                        const formData = new FormData();
-                        formData.append('status', newStatus);
-                        formData.append('redirect_to', 'job_detail');
-                        
                         try {
-                            const response = await fetch('/deliverables/' + deliverableId + '/status', {
-                                method: 'POST',
-                                body: formData
-                            });
-                            
-                            if (response.ok) {
-                                // Refresh the kanban by reloading partial
-                                const jobId = draggedCard.dataset.jobId;
-                                const labelId = new URLSearchParams(window.location.search).get('label_id');
-                                let url = '/jobs/' + jobId + '/kanban';
-                                if (labelId) url += '?label_id=' + labelId;
-                                
-                                const kanbanResponse = await fetch(url);
-                                if (kanbanResponse.ok) {
-                                    const html = await kanbanResponse.text();
-                                    kanbanContainer.innerHTML = html;
-                                    // Reset init flag so events work on new content
-                                    kanbanContainer.dataset.dragDropInit = 'false';
-                                    initKanbanDragDrop();
-                                }
-                            }
+                            await config.onDrop(draggedCard, newStatus, container);
                         } catch (error) {
-                            console.error('Failed to update task status:', error);
+                            console.error('Failed to update:', error);
                         }
                     }
                 }
             });
         }
         
-        document.addEventListener('DOMContentLoaded', initKanbanDragDrop);
+        // Job Kanban initialization
+        function initJobKanban() {
+            initKanbanBoard({
+                containerId: 'job-kanban',
+                cardClass: 'kanban-card',
+                columnClass: 'kanban-cards',
+                highlightClass: 'bg-gray-900/10 border-2 border-dashed border-gray-500',
+                onDrop: async function(card, newStatus, container) {
+                    const deliverableId = card.dataset.deliverableId;
+                    const formData = new FormData();
+                    formData.append('status', newStatus);
+                    formData.append('redirect_to', 'job_detail');
+                    
+                    const response = await fetch('/deliverables/' + deliverableId + '/status', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        const jobId = card.dataset.jobId;
+                        const labelId = new URLSearchParams(window.location.search).get('label_id');
+                        let url = '/jobs/' + jobId + '/kanban';
+                        if (labelId) url += '?label_id=' + labelId;
+                        
+                        const kanbanResponse = await fetch(url);
+                        if (kanbanResponse.ok) {
+                            container.innerHTML = await kanbanResponse.text();
+                            container.dataset.dragDropInit = 'false';
+                            initJobKanban();
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Deals Kanban initialization
+        function initDealsKanban() {
+            initKanbanBoard({
+                containerId: 'deals-board',
+                cardClass: 'deal-card',
+                columnClass: 'deals-column',
+                highlightClass: 'bg-gray-900/10 border-2 border-dashed border-gray-500',
+                onDrop: async function(card, newStage, container) {
+                    const dealId = card.dataset.dealId;
+                    const formData = new FormData();
+                    formData.append('stage', newStage);
+                    
+                    const response = await fetch('/deals/' + dealId + '/stage', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        const boardResponse = await fetch('/deals/board');
+                        if (boardResponse.ok) {
+                            container.innerHTML = await boardResponse.text();
+                            container.dataset.dragDropInit = 'false';
+                            initDealsKanban();
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Client Kanban initialization  
+        function initClientKanban() {
+            initKanbanBoard({
+                containerId: 'client-kanban',
+                cardClass: 'kanban-card',
+                columnClass: 'kanban-cards',
+                highlightClass: 'bg-gray-900/10 border-2 border-dashed border-gray-500',
+                onDrop: async function(card, newStatus, container) {
+                    const deliverableId = card.dataset.deliverableId;
+                    const clientId = container.dataset.clientId;
+                    const formData = new FormData();
+                    formData.append('status', newStatus);
+                    formData.append('redirect_to', 'client_detail');
+                    
+                    const response = await fetch('/deliverables/' + deliverableId + '/status', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        const kanbanResponse = await fetch('/clients/' + clientId + '/kanban');
+                        if (kanbanResponse.ok) {
+                            container.innerHTML = await kanbanResponse.text();
+                            container.dataset.dragDropInit = 'false';
+                            initClientKanban();
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Initialize all kanbans on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initJobKanban();
+            initDealsKanban();
+            initClientKanban();
+        });
+        
         // Re-init after HTMX swaps
         document.body.addEventListener('htmx:afterSwap', function(e) {
             if (e.target.id === 'job-kanban') {
-                const container = document.getElementById('job-kanban');
-                if (container) container.dataset.dragDropInit = 'false';
-                initKanbanDragDrop();
+                e.target.dataset.dragDropInit = 'false';
+                initJobKanban();
+            }
+            if (e.target.id === 'deals-board') {
+                e.target.dataset.dragDropInit = 'false';
+                initDealsKanban();
+            }
+            if (e.target.id === 'client-kanban') {
+                e.target.dataset.dragDropInit = 'false';
+                initClientKanban();
             }
         });
     </script>

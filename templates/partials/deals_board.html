@@ -15,9 +15,12 @@
                 <span class="badge badge-ghost badge-sm" data-testid="badge-count-{{ stage|lower }}">{{ deals_by_stage[stage]|length }}</span>
             </div>
             
-            <div class="space-y-3" id="column-{{ stage|lower }}" data-testid="column-{{ stage|lower }}">
+            <div class="space-y-3 deals-column min-h-32" id="column-{{ stage|lower }}" data-stage="{{ stage }}" data-testid="column-{{ stage|lower }}">
                 {% for deal in deals_by_stage[stage] %}
-                <div class="deal-card bg-base-100 rounded-lg p-4 border border-base-300 hover:border-purple-500/50" data-testid="card-deal-{{ deal.id }}">
+                <div class="deal-card bg-base-100 rounded-lg p-4 border border-base-300 hover:border-gray-500/50 cursor-grab active:cursor-grabbing" 
+                     draggable="true" 
+                     data-deal-id="{{ deal.id }}" 
+                     data-testid="card-deal-{{ deal.id }}">
                     <div class="flex items-start justify-between gap-2 mb-2">
                         <span class="text-xs text-base-content/60 bg-base-300 px-2 py-0.5 rounded">{{ deal.client.name }}</span>
                         {% if deal.is_recurring %}
@@ -28,38 +31,21 @@
                         {% endif %}
                     </div>
                     
-                    <a href="{{ url_for('deal_detail', deal_id=deal.id) }}" class="font-medium text-sm mb-2 block hover:text-purple-400 transition-colors" data-testid="link-deal-{{ deal.id }}">{{ deal.title }}</a>
+                    <a href="{{ url_for('deal_detail', deal_id=deal.id) }}" class="font-medium text-sm mb-2 block hover:text-gray-600 transition-colors" data-testid="link-deal-{{ deal.id }}">{{ deal.title }}</a>
                     
                     <div class="flex items-center justify-between">
-                        <span class="text-lg font-bold text-purple-400">${{ "{:,.0f}".format(deal.value) }}</span>
+                        <span class="text-lg font-bold text-gray-700">${{ "{:,.0f}".format(deal.value) }}</span>
                         
-                        {% if stage != 'Won' and stage != 'Lost' %}
-                        <div class="dropdown dropdown-end">
-                            <label tabindex="0" class="btn btn-ghost btn-xs" data-testid="button-move-{{ deal.id }}">
-                                <i class="fas fa-ellipsis-v"></i>
-                            </label>
-                            <ul tabindex="0" class="dropdown-content z-50 menu p-2 shadow-lg bg-base-300 rounded-lg w-40">
-                                {% for target_stage in stages %}
-                                {% if target_stage != stage %}
-                                <li>
-                                    <form hx-post="{{ url_for('update_deal_stage', deal_id=deal.id) }}" hx-target="#deals-board" hx-swap="innerHTML">
-                                        <input type="hidden" name="stage" value="{{ target_stage }}">
-                                        <button type="submit" class="w-full text-left" data-testid="button-move-to-{{ target_stage|lower }}-{{ deal.id }}">
-                                            <span class="w-2 h-2 rounded-full inline-block mr-2
-                                                {% if target_stage == 'New' %}bg-info
-                                                {% elif target_stage == 'Proposal' %}bg-warning
-                                                {% elif target_stage == 'Negotiation' %}bg-accent
-                                                {% elif target_stage == 'Won' %}bg-success
-                                                {% else %}bg-error{% endif %}"></span>
-                                            {{ target_stage }}
-                                        </button>
-                                    </form>
-                                </li>
-                                {% endif %}
-                                {% endfor %}
-                            </ul>
+                        <div class="flex items-center gap-1">
+                            <a href="{{ url_for('deal_detail', deal_id=deal.id) }}" class="btn btn-ghost btn-xs" data-testid="button-edit-deal-{{ deal.id }}">
+                                <i class="fas fa-edit text-xs"></i>
+                            </a>
+                            <form hx-post="{{ url_for('delete_deal', deal_id=deal.id) }}" hx-target="#deals-board" hx-swap="innerHTML" hx-confirm="Delete this deal?">
+                                <button type="submit" class="btn btn-ghost btn-xs text-error" data-testid="button-delete-deal-{{ deal.id }}">
+                                    <i class="fas fa-trash text-xs"></i>
+                                </button>
+                            </form>
                         </div>
-                        {% endif %}
                     </div>
                     
                     {% if deal.notes %}

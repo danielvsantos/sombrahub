@@ -582,6 +582,7 @@ def edit_deal(deal_id):
 
 
 @app.route('/deals/<int:deal_id>/update-stage', methods=['POST'])
+@app.route('/deals/<int:deal_id>/stage', methods=['POST'])
 @login_required
 @admin_required
 def update_deal_stage(deal_id):
@@ -604,6 +605,36 @@ def update_deal_stage(deal_id):
         flash(f'Deal won! New job created for {deal.client.name}', 'success')
     
     db.session.commit()
+    
+    if request.headers.get('HX-Request'):
+        stages = ['New', 'Proposal', 'Negotiation', 'Won', 'Lost']
+        deals_by_stage = {}
+        for s in stages:
+            deals_by_stage[s] = Deal.query.filter_by(stage=s).all()
+        return render_template('partials/deals_board.html', deals_by_stage=deals_by_stage, stages=stages)
+    
+    return redirect(url_for('deals'))
+
+
+@app.route('/deals/board')
+@login_required
+@admin_required
+def deals_board():
+    stages = ['New', 'Proposal', 'Negotiation', 'Won', 'Lost']
+    deals_by_stage = {}
+    for stage in stages:
+        deals_by_stage[stage] = Deal.query.filter_by(stage=stage).all()
+    return render_template('partials/deals_board.html', deals_by_stage=deals_by_stage, stages=stages)
+
+
+@app.route('/deals/<int:deal_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_deal(deal_id):
+    deal = Deal.query.get_or_404(deal_id)
+    db.session.delete(deal)
+    db.session.commit()
+    flash('Deal deleted.', 'success')
     
     if request.headers.get('HX-Request'):
         stages = ['New', 'Proposal', 'Negotiation', 'Won', 'Lost']
@@ -1132,6 +1163,26 @@ def client_detail(client_id):
     users = User.query.all()
     return render_template('client_detail.html', client=client, statuses=statuses, 
                          deliverables_by_status=deliverables_by_status, users=users, today=date.today())
+
+
+@app.route('/clients/<int:client_id>/kanban')
+@login_required
+@admin_required
+def client_kanban(client_id):
+    client = Client.query.get_or_404(client_id)
+    
+    all_deliverables = []
+    for job in client.jobs:
+        all_deliverables.extend(job.deliverables)
+    
+    statuses = TASK_STATUSES
+    deliverables_by_status = {}
+    for status in statuses:
+        deliverables_by_status[status] = [d for d in all_deliverables if d.status == status]
+    
+    return render_template('partials/client_kanban.html', 
+                          client=client, statuses=statuses, 
+                          deliverables_by_status=deliverables_by_status, today=date.today())
 
 
 @app.route('/clients/add', methods=['POST'])

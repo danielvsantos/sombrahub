@@ -32,67 +32,13 @@
 <div class="card bg-base-200 shadow-lg mb-6">
     <div class="card-body">
         <h2 class="card-title text-lg mb-4">
-            <i class="fas fa-columns text-blue-400"></i>
+            <i class="fas fa-columns text-gray-600"></i>
             All Tasks
         </h2>
                 
                 {% if client.jobs %}
-                <div class="flex gap-4 overflow-x-auto pb-4">
-                    {% for status in statuses %}
-                    <div class="w-64 flex-shrink-0">
-                        <div class="bg-base-300/50 rounded-xl p-4 min-h-64">
-                            <div class="flex items-center justify-between mb-4">
-                                <h3 class="font-semibold flex items-center gap-2 text-sm">
-                                    <span class="w-2 h-2 rounded-full 
-                                        {% if status == 'To Do' %}bg-gray-400
-                                        {% elif status == 'In Progress' %}bg-info
-                                        {% elif status == 'Review' %}bg-warning
-                                        {% else %}bg-success{% endif %}"></span>
-                                    {{ status }}
-                                </h3>
-                                <span class="badge badge-ghost badge-sm">{{ deliverables_by_status[status]|length }}</span>
-                            </div>
-                            
-                            <div class="space-y-2">
-                                {% for deliverable in deliverables_by_status[status] %}
-                                <a href="{{ url_for('job_detail', job_id=deliverable.job_id) }}" 
-                                   class="block bg-base-100 rounded-lg p-3 border border-base-300 hover:border-purple-500/50 transition-colors" 
-                                   data-testid="card-deliverable-{{ deliverable.id }}">
-                                    <p class="font-medium text-sm mb-1">{{ deliverable.title }}</p>
-                                    <p class="text-xs text-base-content/60">{{ deliverable.job.display_title }}</p>
-                                    
-                                    <div class="flex items-center justify-between text-xs mt-2">
-                                        {% if deliverable.assignee %}
-                                        <div class="flex items-center gap-1">
-                                            <div class="avatar placeholder">
-                                                <div class="bg-purple-500/20 text-purple-400 rounded-full w-5">
-                                                    <span class="text-xs">{{ deliverable.assignee.username[0].upper() }}</span>
-                                                </div>
-                                            </div>
-                                            <span class="text-base-content/60">{{ deliverable.assignee.username }}</span>
-                                        </div>
-                                        {% else %}
-                                        <span class="text-base-content/40">Unassigned</span>
-                                        {% endif %}
-                                        
-                                        {% if deliverable.due_date %}
-                                        <span class="{% if deliverable.due_date < today %}text-error{% else %}text-base-content/60{% endif %}">
-                                            {{ deliverable.due_date.strftime('%b %d') }}
-                                        </span>
-                                        {% endif %}
-                                    </div>
-                                </a>
-                                {% endfor %}
-                                
-                                {% if deliverables_by_status[status]|length == 0 %}
-                                <div class="text-center py-6 text-base-content/40">
-                                    <p class="text-xs">No items</p>
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
+                <div id="client-kanban" data-client-id="{{ client.id }}">
+                    {% include 'partials/client_kanban.html' %}
                 </div>
                 {% else %}
                 <div class="text-center py-12 text-base-content/40">
