@@ -295,18 +295,22 @@
         function openTaskModal(mode, jobId, taskData = null, redirectTo = 'job_detail', htmxTarget = '#job-kanban') {
             const modal = document.getElementById('task_modal');
             if (!modal) {
-                console.error('Task modal not found');
+                console.error('Task modal not found - modal is null');
                 return;
             }
             const form = document.getElementById('task-form');
+            if (!form) {
+                console.error('Task form not found - form is null');
+                return;
+            }
             const iconEl = document.getElementById('task-modal-icon');
             const headingEl = document.getElementById('task-modal-heading');
             const submitTextEl = document.getElementById('task-submit-text');
             const labelSelect = document.getElementById('task-label');
             const assigneesContainer = document.getElementById('task-assignees-container');
             
-            if (!form || !labelSelect || !assigneesContainer) {
-                console.error('Task modal elements not found');
+            if (!labelSelect || !assigneesContainer) {
+                console.error('Task modal elements not found - labelSelect or assigneesContainer is null');
                 return;
             }
             
@@ -354,7 +358,7 @@
                 document.getElementById('task-label').value = '';
                 assigneesContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
                 
-                fileSection.classList.add('hidden');
+                if (fileSection) fileSection.classList.add('hidden');
             } else if (mode === 'edit' && taskData) {
                 iconEl.className = 'fas fa-edit text-blue-400';
                 headingEl.textContent = 'Edit Task';
@@ -373,34 +377,40 @@
                     cb.checked = selectedIds.includes(parseInt(cb.value));
                 });
                 
-                fileSection.classList.remove('hidden');
-                fileUploadForm.action = '/deliverables/' + taskData.id + '/upload';
-                fileDeleteForm.action = '/deliverables/' + taskData.id + '/file/delete';
+                if (fileSection) fileSection.classList.remove('hidden');
+                if (fileUploadForm) fileUploadForm.action = '/deliverables/' + taskData.id + '/upload';
+                if (fileDeleteForm) fileDeleteForm.action = '/deliverables/' + taskData.id + '/file/delete';
                 
-                if (taskData.file_name && taskData.file_original_name) {
-                    fileDisplay.classList.remove('hidden');
-                    document.getElementById('task-file-name').textContent = taskData.file_original_name;
-                    document.getElementById('task-file-link').href = '/deliverables/' + taskData.id + '/file';
-                    
-                    const ext = taskData.file_original_name.split('.').pop().toLowerCase();
-                    const fileIcon = document.getElementById('task-file-icon');
-                    if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
-                        fileIcon.className = 'fas fa-file-image text-lg text-primary';
-                    } else if (ext === 'pdf') {
-                        fileIcon.className = 'fas fa-file-pdf text-lg text-error';
-                    } else if (['doc', 'docx'].includes(ext)) {
-                        fileIcon.className = 'fas fa-file-word text-lg text-info';
-                    } else if (['xls', 'xlsx'].includes(ext)) {
-                        fileIcon.className = 'fas fa-file-excel text-lg text-success';
-                    } else if (['mp4', 'mov'].includes(ext)) {
-                        fileIcon.className = 'fas fa-file-video text-lg text-warning';
-                    } else if (['psd', 'ai'].includes(ext)) {
-                        fileIcon.className = 'fas fa-file-alt text-lg text-secondary';
+                if (fileDisplay) {
+                    if (taskData.file_name && taskData.file_original_name) {
+                        fileDisplay.classList.remove('hidden');
+                        const fileName = document.getElementById('task-file-name');
+                        const fileLink = document.getElementById('task-file-link');
+                        const fileIcon = document.getElementById('task-file-icon');
+                        if (fileName) fileName.textContent = taskData.file_original_name;
+                        if (fileLink) fileLink.href = '/deliverables/' + taskData.id + '/file';
+                        
+                        if (fileIcon) {
+                            const ext = taskData.file_original_name.split('.').pop().toLowerCase();
+                            if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+                                fileIcon.className = 'fas fa-file-image text-lg text-primary';
+                            } else if (ext === 'pdf') {
+                                fileIcon.className = 'fas fa-file-pdf text-lg text-error';
+                            } else if (['doc', 'docx'].includes(ext)) {
+                                fileIcon.className = 'fas fa-file-word text-lg text-info';
+                            } else if (['xls', 'xlsx'].includes(ext)) {
+                                fileIcon.className = 'fas fa-file-excel text-lg text-success';
+                            } else if (['mp4', 'mov'].includes(ext)) {
+                                fileIcon.className = 'fas fa-file-video text-lg text-warning';
+                            } else if (['psd', 'ai'].includes(ext)) {
+                                fileIcon.className = 'fas fa-file-alt text-lg text-secondary';
+                            } else {
+                                fileIcon.className = 'fas fa-file text-lg text-primary';
+                            }
+                        }
                     } else {
-                        fileIcon.className = 'fas fa-file text-lg text-primary';
+                        fileDisplay.classList.add('hidden');
                     }
-                } else {
-                    fileDisplay.classList.add('hidden');
                 }
             }
             
