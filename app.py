@@ -940,6 +940,18 @@ def edit_deliverable(deliverable_id):
                 deliverables_by_status[s] = [d for d in job.deliverables if d.status == s]
             return render_template('partials/job_kanban.html', job=job, users=users, 
                                  statuses=statuses, deliverables_by_status=deliverables_by_status, today=date.today())
+        if redirect_to == 'client_detail':
+            client = job.client
+            if client:
+                statuses = TASK_STATUSES
+                all_deliverables = []
+                for j in client.jobs:
+                    all_deliverables.extend(j.deliverables)
+                deliverables_by_status = {}
+                for s in statuses:
+                    deliverables_by_status[s] = [d for d in all_deliverables if d.status == s]
+                return render_template('partials/client_kanban.html',
+                                     statuses=statuses, deliverables_by_status=deliverables_by_status, today=date.today())
         users = User.query.all()
         return render_template('partials/deliverables_table.html', job=job, users=users, today=date.today())
     
@@ -980,6 +992,7 @@ def delete_deliverable(deliverable_id):
     deliverable = Deliverable.query.get_or_404(deliverable_id)
     job = deliverable.job
     redirect_to = request.form.get('redirect_to', 'production')
+    client_id = request.form.get('client_id')
     
     db.session.delete(deliverable)
     db.session.commit()
@@ -995,6 +1008,21 @@ def delete_deliverable(deliverable_id):
                 deliverables_by_status[s] = [d for d in job.deliverables if d.status == s]
             return render_template('partials/job_kanban.html', job=job, users=users, 
                                  statuses=statuses, deliverables_by_status=deliverables_by_status, today=date.today())
+        if redirect_to == 'client_detail' and client_id:
+            try:
+                client = Client.query.get(int(client_id))
+                if client:
+                    statuses = TASK_STATUSES
+                    all_deliverables = []
+                    for j in client.jobs:
+                        all_deliverables.extend(j.deliverables)
+                    deliverables_by_status = {}
+                    for s in statuses:
+                        deliverables_by_status[s] = [d for d in all_deliverables if d.status == s]
+                    return render_template('partials/client_kanban.html',
+                                         statuses=statuses, deliverables_by_status=deliverables_by_status, today=date.today())
+            except (ValueError, TypeError):
+                pass
         users = User.query.all()
         return render_template('partials/deliverables_table.html', job=job, users=users, today=date.today())
     
