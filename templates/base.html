@@ -294,12 +294,21 @@
         
         function openTaskModal(mode, jobId, taskData = null, redirectTo = 'job_detail', htmxTarget = '#job-kanban') {
             const modal = document.getElementById('task_modal');
+            if (!modal) {
+                console.error('Task modal not found');
+                return;
+            }
             const form = document.getElementById('task-form');
             const iconEl = document.getElementById('task-modal-icon');
             const headingEl = document.getElementById('task-modal-heading');
             const submitTextEl = document.getElementById('task-submit-text');
             const labelSelect = document.getElementById('task-label');
             const assigneesContainer = document.getElementById('task-assignees-container');
+            
+            if (!form || !labelSelect || !assigneesContainer) {
+                console.error('Task modal elements not found');
+                return;
+            }
             
             const users = {{ all_users_json | tojson | safe if all_users_json else '[]' }};
             const labels = {{ all_labels_json | tojson | safe if all_labels_json else '[]' }};
@@ -423,12 +432,14 @@
         async function openEditTaskModal(taskId, jobId, redirectTo, htmxTarget) {
             try {
                 const response = await fetch('/api/deliverables/' + taskId);
-                if (response.ok) {
-                    const taskData = await response.json();
-                    openTaskModal('edit', jobId, taskData, redirectTo, htmxTarget);
+                if (!response.ok) {
+                    console.error('API error:', response.status, response.statusText);
+                    return;
                 }
+                const taskData = await response.json();
+                openTaskModal('edit', jobId, taskData, redirectTo, htmxTarget);
             } catch (error) {
-                console.error('Failed to load task data:', error);
+                console.error('Failed to load task data:', error.message || error);
             }
         }
         

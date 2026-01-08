@@ -13,19 +13,19 @@
             <h1 class="text-3xl font-bold" data-testid="text-deal-title">{{ deal.title }}</h1>
             <p class="text-base-content/60 mt-1">{{ deal.client.name }}</p>
         </div>
-<div class="flex items-center gap-3">
-            <span class="text-sm text-base-content/60">Status:</span>
-            <span class="badge badge-lg font-medium
-                {% if deal.stage == 'New' %}badge-info
-                {% elif deal.stage == 'Proposal' %}badge-warning
-                {% elif deal.stage == 'Negotiation' %}badge-accent
-                {% elif deal.stage == 'Won' %}badge-success
-                {% else %}badge-error{% endif %}">
+<div class="flex items-center gap-2">
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold
+                {% if deal.stage == 'New' %}bg-info/15 text-info
+                {% elif deal.stage == 'Proposal' %}bg-warning/15 text-warning
+                {% elif deal.stage == 'Negotiation' %}bg-accent/15 text-accent
+                {% elif deal.stage == 'Won' %}bg-success/15 text-success
+                {% else %}bg-error/15 text-error{% endif %}">
+                <i class="fas fa-circle text-[6px] mr-2"></i>
                 {{ deal.stage }}
             </span>
             {% if deal.is_recurring %}
-            <span class="badge badge-secondary badge-lg">
-                <i class="fas fa-sync-alt mr-1 text-xs"></i>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-secondary/15 text-secondary">
+                <i class="fas fa-sync-alt mr-1.5 text-xs"></i>
                 Retainer
             </span>
             {% endif %}
