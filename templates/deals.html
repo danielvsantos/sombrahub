@@ -30,7 +30,7 @@
             New Deal
         </h3>
         
-        <form hx-post="{{ url_for('add_deal') }}" hx-target="#deals-board" hx-swap="innerHTML" class="space-y-4">
+        <form id="add-deal-form" hx-post="{{ url_for('add_deal') }}" hx-target="#deals-board" hx-swap="innerHTML" class="space-y-4">
             <div class="form-control">
                 <label class="label">
                     <span class="label-text">Client</span>
@@ -102,12 +102,20 @@
             
             <div class="modal-action">
                 <button type="button" onclick="document.getElementById('add_deal_modal').close()" class="btn btn-ghost" data-testid="button-cancel">Cancel</button>
-                <button type="submit" class="btn btn-primary gap-2" onclick="document.getElementById('add_deal_modal').close()" data-testid="button-submit-deal">
+                <button type="submit" class="btn btn-primary gap-2" data-testid="button-submit-deal">
                     <i class="fas fa-check"></i>
                     Create Deal
                 </button>
             </div>
         </form>
+        <script>
+            document.getElementById('add-deal-form').addEventListener('htmx:afterRequest', function(event) {
+                if (event.detail.successful) {
+                    document.getElementById('add_deal_modal').close();
+                    event.target.reset();
+                }
+            });
+        </script>
     </div>
     <form method="dialog" class="modal-backdrop">
         <button>close</button>
