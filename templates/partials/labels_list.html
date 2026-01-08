@@ -1,0 +1,89 @@
+<div class="card bg-base-200">
+    <div class="card-body">
+        <h2 class="card-title text-lg mb-4">All Labels</h2>
+        
+        {% if labels %}
+        <div class="overflow-x-auto">
+            <table class="table" data-testid="table-labels">
+                <thead>
+                    <tr>
+                        <th>Label</th>
+                        <th>Color</th>
+                        <th>Tasks Using</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for label in labels %}
+                    <tr data-testid="row-label-{{ label.id }}">
+                        <td>
+                            <span class="badge badge-{{ label.color }}" data-testid="badge-label-{{ label.id }}">{{ label.name }}</span>
+                        </td>
+                        <td class="capitalize">{{ label.color }}</td>
+                        <td>{{ label.deliverables|length }}</td>
+                        <td class="text-right">
+                            <div class="flex justify-end gap-2">
+                                <button onclick="document.getElementById('edit-label-{{ label.id }}').showModal()" 
+                                        class="btn btn-sm btn-ghost" data-testid="button-edit-label-{{ label.id }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <form action="{{ url_for('delete_label', label_id=label.id) }}" method="POST"
+                                      hx-post="{{ url_for('delete_label', label_id=label.id) }}"
+                                      hx-target="#labels-list"
+                                      hx-swap="innerHTML"
+                                      hx-confirm="Delete this label? Tasks using it will be unassigned.">
+                                    <button type="submit" class="btn btn-sm btn-ghost text-error" data-testid="button-delete-label-{{ label.id }}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            <dialog id="edit-label-{{ label.id }}" class="modal">
+                                <div class="modal-box">
+                                    <h3 class="font-bold text-lg mb-4">Edit Label</h3>
+                                    <form action="{{ url_for('edit_label', label_id=label.id) }}" method="POST"
+                                          hx-post="{{ url_for('edit_label', label_id=label.id) }}"
+                                          hx-target="#labels-list"
+                                          hx-swap="innerHTML">
+                                        <div class="form-control mb-4">
+                                            <label class="label"><span class="label-text">Label Name</span></label>
+                                            <input type="text" name="name" value="{{ label.name }}" 
+                                                   class="input input-bordered" required>
+                                        </div>
+                                        <div class="form-control mb-4">
+                                            <label class="label"><span class="label-text">Color</span></label>
+                                            <select name="color" class="select select-bordered">
+                                                <option value="primary" {% if label.color == 'primary' %}selected{% endif %}>Primary (Blue)</option>
+                                                <option value="secondary" {% if label.color == 'secondary' %}selected{% endif %}>Secondary (Purple)</option>
+                                                <option value="accent" {% if label.color == 'accent' %}selected{% endif %}>Accent (Teal)</option>
+                                                <option value="info" {% if label.color == 'info' %}selected{% endif %}>Info (Cyan)</option>
+                                                <option value="success" {% if label.color == 'success' %}selected{% endif %}>Success (Green)</option>
+                                                <option value="warning" {% if label.color == 'warning' %}selected{% endif %}>Warning (Yellow)</option>
+                                                <option value="error" {% if label.color == 'error' %}selected{% endif %}>Error (Red)</option>
+                                                <option value="neutral" {% if label.color == 'neutral' %}selected{% endif %}>Neutral (Gray)</option>
+                                            </select>
+                                        </div>
+                                        <div class="modal-action">
+                                            <button type="button" onclick="document.getElementById('edit-label-{{ label.id }}').close()" class="btn">Cancel</button>
+                                            <button type="submit" class="btn btn-primary" onclick="document.getElementById('edit-label-{{ label.id }}').close()">Save</button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <form method="dialog" class="modal-backdrop">
+                                    <button>close</button>
+                                </form>
+                            </dialog>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-8 text-base-content/60">
+            <i class="fas fa-tags text-4xl mb-3"></i>
+            <p>No labels yet. Create your first label above.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>

@@ -51,11 +51,19 @@
             
             <div class="form-control">
                 <label class="label">
-                    <span class="label-text">Assignee</span>
+                    <span class="label-text">Label</span>
                 </label>
-                <select id="task-assignee" name="assignee_id" class="select select-bordered bg-base-300/50" data-testid="select-task-assignee">
-                    <option value="">Unassigned</option>
+                <select id="task-label" name="label_id" class="select select-bordered bg-base-300/50" data-testid="select-task-label">
+                    <option value="">No Label</option>
                 </select>
+            </div>
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Assignees</span>
+                </label>
+                <div id="task-assignees-container" class="bg-base-300/50 rounded-lg p-3 max-h-40 overflow-y-auto space-y-2">
+                </div>
             </div>
             
             <div class="modal-action">

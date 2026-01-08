@@ -19,6 +19,7 @@ Sombra Hub is a full-stack web application for managing Sombra Lab's sales and p
    - Login/logout with Flask-Login
    - Role-based users (Admin, Photographer)
    - Protected routes requiring authentication
+   - Role-based access control (RBAC): Clients and Deals restricted to Admin users only
 
 2. **User Management (Admin Only)**
    - CRUD operations for team members
@@ -53,7 +54,7 @@ Sombra Hub is a full-stack web application for managing Sombra Lab's sales and p
 
 6. **Production Calendar**
    - Monthly calendar view of all tasks by due date
-   - Filter by specific job
+   - Filter by specific job and/or label
    - Color-coded status indicators
    - Navigate between months
    - Click on task to view job detail

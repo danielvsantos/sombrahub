@@ -19,15 +19,26 @@
                 <div class="bg-base-100 rounded-lg p-3 border border-base-300 hover:border-purple-500/50 transition-colors" data-testid="card-deliverable-{{ deliverable.id }}">
                     <p class="font-medium text-sm mb-2">{{ deliverable.title }}</p>
                     
+                    {% if deliverable.label %}
+                    <div class="mb-2">
+                        <span class="badge badge-{{ deliverable.label.color }} badge-sm">{{ deliverable.label.name }}</span>
+                    </div>
+                    {% endif %}
+                    
                     <div class="flex items-center justify-between text-xs">
-                        {% if deliverable.assignee %}
-                        <div class="flex items-center gap-1">
-                            <div class="avatar placeholder">
-                                <div class="bg-purple-500/20 text-purple-400 rounded-full w-5">
-                                    <span class="text-xs">{{ deliverable.assignee.username[0].upper() }}</span>
+                        {% set assignees = deliverable.all_assignees %}
+                        {% if assignees %}
+                        <div class="flex items-center -space-x-1">
+                            {% for user in assignees[:3] %}
+                            <div class="avatar placeholder" title="{{ user.full_name or user.username }}">
+                                <div class="bg-purple-500/20 text-purple-400 rounded-full w-5 border border-base-100">
+                                    <span class="text-xs">{{ user.username[0].upper() }}</span>
                                 </div>
                             </div>
-                            <span class="text-base-content/60">{{ deliverable.assignee.username }}</span>
+                            {% endfor %}
+                            {% if assignees|length > 3 %}
+                            <span class="text-base-content/60 pl-2">+{{ assignees|length - 3 }}</span>
+                            {% endif %}
                         </div>
                         {% else %}
                         <span class="text-base-content/40">Unassigned</span>

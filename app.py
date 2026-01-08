@@ -149,6 +149,12 @@ class JobAssignment(db.Model):
     role = db.Column(db.String(50), default='Photographer')
 
 
+class Label(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable=False, unique=True)
+    color = db.Column(db.String(20), default='primary')
+
+
 class Deliverable(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     job_id = db.Column(db.Integer, db.ForeignKey('job.id'), nullable=False)
@@ -157,6 +163,26 @@ class Deliverable(db.Model):
     status = db.Column(db.String(20), default='To Do')
     assignee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     due_date = db.Column(db.Date, nullable=True)
+    label_id = db.Column(db.Integer, db.ForeignKey('label.id'), nullable=True)
+    
+    label = db.relationship('Label', backref='deliverables')
+    task_assignments = db.relationship('TaskAssignment', backref='task', lazy=True, cascade='all, delete-orphan')
+    
+    @property
+    def all_assignees(self):
+        """Returns all assignees including legacy single assignee and multi-assignees"""
+        assignees = [ta.user for ta in self.task_assignments]
+        if self.assignee and self.assignee not in assignees:
+            assignees.insert(0, self.assignee)
+        return assignees
+
+
+class TaskAssignment(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    task_id = db.Column(db.Integer, db.ForeignKey('deliverable.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    
+    user = db.relationship('User', backref='task_assignments')
 
 
 @login_manager.user_loader
@@ -174,8 +200,16 @@ def inject_users():
     if current_user.is_authenticated:
         all_users = User.query.all()
         users_json = [{'id': u.id, 'username': u.username, 'full_name': u.full_name or u.username} for u in all_users]
-        return {'all_users': all_users, 'all_users_json': users_json}
-    return {'all_users': [], 'all_users_json': []}
+        all_labels = Label.query.order_by(Label.name).all()
+        labels_json = [{'id': l.id, 'name': l.name, 'color': l.color} for l in all_labels]
+        return {
+            'all_users': all_users, 
+            'all_users_json': users_json,
+            'all_labels': all_labels,
+            'all_labels_json': labels_json,
+            'task_statuses': TASK_STATUSES
+        }
+    return {'all_users': [], 'all_users_json': [], 'all_labels': [], 'all_labels_json': [], 'task_statuses': TASK_STATUSES}
 
 
 @app.route('/')
@@ -345,10 +379,98 @@ def delete_user(user_id):
     return redirect(url_for('users'))
 
 
+# ==================== LABELS ====================
+
+@app.route('/labels')
+@login_required
+@admin_required
+def labels():
+    all_labels = Label.query.order_by(Label.name).all()
+    return render_template('labels.html', labels=all_labels)
+
+
+@app.route('/labels/add', methods=['POST'])
+@login_required
+@admin_required
+def add_label():
+    name = request.form.get('name', '').strip()
+    color = request.form.get('color', 'primary')
+    
+    if not name:
+        flash('Label name is required.', 'error')
+        return redirect(url_for('labels'))
+    
+    existing = Label.query.filter_by(name=name).first()
+    if existing:
+        flash('A label with this name already exists.', 'error')
+        return redirect(url_for('labels'))
+    
+    label = Label(name=name, color=color)
+    db.session.add(label)
+    db.session.commit()
+    
+    flash('Label created successfully!', 'success')
+    
+    if request.headers.get('HX-Request'):
+        all_labels = Label.query.order_by(Label.name).all()
+        return render_template('partials/labels_list.html', labels=all_labels)
+    
+    return redirect(url_for('labels'))
+
+
+@app.route('/labels/<int:label_id>/edit', methods=['POST'])
+@login_required
+@admin_required
+def edit_label(label_id):
+    label = Label.query.get_or_404(label_id)
+    
+    name = request.form.get('name', '').strip()
+    color = request.form.get('color', label.color)
+    
+    if name and name != label.name:
+        existing = Label.query.filter_by(name=name).first()
+        if existing:
+            flash('A label with this name already exists.', 'error')
+            return redirect(url_for('labels'))
+        label.name = name
+    
+    label.color = color
+    db.session.commit()
+    
+    flash('Label updated successfully!', 'success')
+    
+    if request.headers.get('HX-Request'):
+        all_labels = Label.query.order_by(Label.name).all()
+        return render_template('partials/labels_list.html', labels=all_labels)
+    
+    return redirect(url_for('labels'))
+
+
+@app.route('/labels/<int:label_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def delete_label(label_id):
+    label = Label.query.get_or_404(label_id)
+    
+    Deliverable.query.filter_by(label_id=label_id).update({'label_id': None})
+    
+    db.session.delete(label)
+    db.session.commit()
+    
+    flash('Label deleted.', 'info')
+    
+    if request.headers.get('HX-Request'):
+        all_labels = Label.query.order_by(Label.name).all()
+        return render_template('partials/labels_list.html', labels=all_labels)
+    
+    return redirect(url_for('labels'))
+
+
 # ==================== DEALS ====================
 
 @app.route('/deals')
 @login_required
+@admin_required
 def deals():
     stages = ['New', 'Proposal', 'Negotiation', 'Won', 'Lost']
     deals_by_stage = {}
@@ -362,6 +484,7 @@ def deals():
 
 @app.route('/deals/add', methods=['POST'])
 @login_required
+@admin_required
 def add_deal():
     client_id = request.form.get('client_id')
     title = request.form.get('title')
@@ -399,6 +522,7 @@ def add_deal():
 
 @app.route('/deals/<int:deal_id>')
 @login_required
+@admin_required
 def deal_detail(deal_id):
     deal = Deal.query.get_or_404(deal_id)
     users = User.query.all()
@@ -408,6 +532,7 @@ def deal_detail(deal_id):
 
 @app.route('/deals/<int:deal_id>/edit', methods=['POST'])
 @login_required
+@admin_required
 def edit_deal(deal_id):
     deal = Deal.query.get_or_404(deal_id)
     
@@ -434,6 +559,7 @@ def edit_deal(deal_id):
 
 @app.route('/deals/<int:deal_id>/update-stage', methods=['POST'])
 @login_required
+@admin_required
 def update_deal_stage(deal_id):
     deal = Deal.query.get_or_404(deal_id)
     new_stage = request.form.get('stage')
@@ -467,6 +593,7 @@ def update_deal_stage(deal_id):
 
 @app.route('/deals/<int:deal_id>/profit-share/add', methods=['POST'])
 @login_required
+@admin_required
 def add_profit_share(deal_id):
     deal = Deal.query.get_or_404(deal_id)
     
@@ -492,6 +619,7 @@ def add_profit_share(deal_id):
 
 @app.route('/profit-share/<int:share_id>/delete', methods=['POST'])
 @login_required
+@admin_required
 def delete_profit_share(share_id):
     share = DealProfitShare.query.get_or_404(share_id)
     deal_id = share.deal_id
@@ -535,6 +663,7 @@ def production_calendar():
     year = request.args.get('year', date.today().year, type=int)
     month = request.args.get('month', date.today().month, type=int)
     job_filter = request.args.get('job_id', '', type=str)
+    label_filter = request.args.get('label_id', '', type=str)
     
     first_day = date(year, month, 1)
     if month == 12:
@@ -549,6 +678,9 @@ def production_calendar():
     
     if job_filter:
         query = query.filter(Deliverable.job_id == int(job_filter))
+    
+    if label_filter:
+        query = query.filter(Deliverable.label_id == int(label_filter))
     
     deliverables = query.all()
     
@@ -569,6 +701,7 @@ def production_calendar():
     next_year = year if month < 12 else year + 1
     
     jobs = Job.query.filter_by(status='Active').all()
+    labels = Label.query.order_by(Label.name).all()
     
     if request.headers.get('HX-Request'):
         return render_template('partials/calendar_grid.html',
@@ -578,6 +711,7 @@ def production_calendar():
                              prev_month=prev_month, prev_year=prev_year,
                              next_month=next_month, next_year=next_year,
                              jobs=jobs, job_filter=job_filter,
+                             labels=labels, label_filter=label_filter,
                              calendar=calendar, today=date.today())
     
     return render_template('production_calendar.html',
@@ -587,6 +721,7 @@ def production_calendar():
                          prev_month=prev_month, prev_year=prev_year,
                          next_month=next_month, next_year=next_year,
                          jobs=jobs, job_filter=job_filter,
+                         labels=labels, label_filter=label_filter,
                          calendar=calendar, today=date.today())
 
 
@@ -614,9 +749,10 @@ def add_deliverable(job_id):
     
     title = request.form.get('title')
     description = request.form.get('description', '')
-    assignee_id = request.form.get('assignee_id')
+    assignee_ids = request.form.getlist('assignee_ids')
     due_date_str = request.form.get('due_date')
     status = request.form.get('status', 'To Do')
+    label_id = request.form.get('label_id')
     
     due_date = None
     if due_date_str:
@@ -626,11 +762,18 @@ def add_deliverable(job_id):
         job_id=job_id,
         title=title,
         description=description,
-        assignee_id=assignee_id if assignee_id else None,
         due_date=due_date,
-        status=status
+        status=status,
+        label_id=int(label_id) if label_id else None
     )
     db.session.add(deliverable)
+    db.session.flush()
+    
+    for uid in assignee_ids:
+        if uid:
+            ta = TaskAssignment(task_id=deliverable.id, user_id=int(uid))
+            db.session.add(ta)
+    
     db.session.commit()
     
     flash('Deliverable added successfully!', 'success')
@@ -659,6 +802,7 @@ def add_deliverable(job_id):
 @login_required
 def get_deliverable_json(deliverable_id):
     deliverable = Deliverable.query.get_or_404(deliverable_id)
+    assignee_ids = [ta.user_id for ta in deliverable.task_assignments]
     return jsonify({
         'id': deliverable.id,
         'job_id': deliverable.job_id,
@@ -666,6 +810,8 @@ def get_deliverable_json(deliverable_id):
         'description': deliverable.description or '',
         'status': deliverable.status,
         'assignee_id': deliverable.assignee_id,
+        'assignee_ids': assignee_ids,
+        'label_id': deliverable.label_id,
         'due_date': deliverable.due_date.strftime('%Y-%m-%d') if deliverable.due_date else ''
     })
 
@@ -680,8 +826,15 @@ def edit_deliverable(deliverable_id):
     deliverable.description = request.form.get('description', '')
     deliverable.status = request.form.get('status', deliverable.status)
     
-    assignee_id = request.form.get('assignee_id')
-    deliverable.assignee_id = int(assignee_id) if assignee_id else None
+    label_id = request.form.get('label_id')
+    deliverable.label_id = int(label_id) if label_id else None
+    
+    assignee_ids = request.form.getlist('assignee_ids')
+    TaskAssignment.query.filter_by(task_id=deliverable.id).delete()
+    for uid in assignee_ids:
+        if uid:
+            ta = TaskAssignment(task_id=deliverable.id, user_id=int(uid))
+            db.session.add(ta)
     
     due_date_str = request.form.get('due_date')
     if due_date_str:
@@ -822,6 +975,7 @@ def remove_job_assignment(assignment_id):
 
 @app.route('/clients')
 @login_required
+@admin_required
 def clients():
     all_clients = Client.query.all()
     return render_template('clients.html', clients=all_clients)
@@ -829,6 +983,7 @@ def clients():
 
 @app.route('/clients/<int:client_id>')
 @login_required
+@admin_required
 def client_detail(client_id):
     client = Client.query.get_or_404(client_id)
     
@@ -848,6 +1003,7 @@ def client_detail(client_id):
 
 @app.route('/clients/add', methods=['POST'])
 @login_required
+@admin_required
 def add_client():
     name = request.form.get('name')
     industry = request.form.get('industry')
@@ -871,6 +1027,7 @@ def add_client():
 
 @app.route('/clients/<int:client_id>/edit', methods=['POST'])
 @login_required
+@admin_required
 def edit_client(client_id):
     client = Client.query.get_or_404(client_id)
     

@@ -2,34 +2,52 @@
     <div class="card-body p-3 sm:p-6">
         <div class="flex flex-col gap-4 mb-6">
             <div class="flex items-center justify-between">
-                <a hx-get="{{ url_for('production_calendar', year=prev_year, month=prev_month, job_id=job_filter) }}" 
+                <a hx-get="{{ url_for('production_calendar', year=prev_year, month=prev_month, job_id=job_filter, label_id=label_filter) }}" 
                    hx-target="#calendar-container" hx-swap="innerHTML"
                    class="btn btn-ghost btn-sm" data-testid="button-prev-month">
                     <i class="fas fa-chevron-left"></i>
                 </a>
                 <h2 class="text-lg sm:text-xl font-bold">{{ calendar.month_name[month] }} {{ year }}</h2>
-                <a hx-get="{{ url_for('production_calendar', year=next_year, month=next_month, job_id=job_filter) }}" 
+                <a hx-get="{{ url_for('production_calendar', year=next_year, month=next_month, job_id=job_filter, label_id=label_filter) }}" 
                    hx-target="#calendar-container" hx-swap="innerHTML"
                    class="btn btn-ghost btn-sm" data-testid="button-next-month">
                     <i class="fas fa-chevron-right"></i>
                 </a>
             </div>
             
-            <div class="flex flex-col sm:flex-row sm:items-center gap-2">
-                <span class="text-sm text-base-content/60">Filter by job:</span>
-                <select hx-get="{{ url_for('production_calendar', year=year, month=month) }}" 
-                        hx-target="#calendar-container" hx-swap="innerHTML"
-                        hx-trigger="change"
-                        hx-include="this"
-                        name="job_id"
-                        class="select select-bordered select-sm bg-base-300/50 w-full sm:w-auto" data-testid="select-job-filter">
-                    <option value="">All Jobs</option>
-                    {% for job in jobs %}
-                    <option value="{{ job.id }}" {% if job_filter|string == job.id|string %}selected{% endif %}>
-                        {{ job.display_title }} ({{ job.client.name }})
-                    </option>
-                    {% endfor %}
-                </select>
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-base-content/60">Job:</span>
+                    <select hx-get="{{ url_for('production_calendar', year=year, month=month) }}" 
+                            hx-target="#calendar-container" hx-swap="innerHTML"
+                            hx-trigger="change"
+                            hx-include="[name='label_id']"
+                            name="job_id"
+                            class="select select-bordered select-sm bg-base-300/50 w-full sm:w-auto" data-testid="select-job-filter">
+                        <option value="">All Jobs</option>
+                        {% for job in jobs %}
+                        <option value="{{ job.id }}" {% if job_filter|string == job.id|string %}selected{% endif %}>
+                            {{ job.display_title }} ({{ job.client.name }})
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-base-content/60">Label:</span>
+                    <select hx-get="{{ url_for('production_calendar', year=year, month=month) }}" 
+                            hx-target="#calendar-container" hx-swap="innerHTML"
+                            hx-trigger="change"
+                            hx-include="[name='job_id']"
+                            name="label_id"
+                            class="select select-bordered select-sm bg-base-300/50 w-full sm:w-auto" data-testid="select-label-filter">
+                        <option value="">All Labels</option>
+                        {% for label in labels %}
+                        <option value="{{ label.id }}" {% if label_filter|string == label.id|string %}selected{% endif %}>
+                            {{ label.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
             </div>
         </div>
         

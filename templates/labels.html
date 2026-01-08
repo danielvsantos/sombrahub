@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Labels - Sombra Hub{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold" data-testid="text-labels-heading">Labels</h1>
+    </div>
+    
+    <div class="card bg-base-200 mb-6">
+        <div class="card-body">
+            <h2 class="card-title text-lg">Add New Label</h2>
+            <form action="{{ url_for('add_label') }}" method="POST" 
+                  hx-post="{{ url_for('add_label') }}"
+                  hx-target="#labels-list"
+                  hx-swap="innerHTML"
+                  class="flex flex-wrap gap-3 items-end">
+                <div class="form-control flex-1 min-w-[200px]">
+                    <label class="label"><span class="label-text">Label Name</span></label>
+                    <input type="text" name="name" placeholder="e.g., Urgent, Photography, Editing" 
+                           class="input input-bordered" required data-testid="input-label-name">
+                </div>
+                <div class="form-control">
+                    <label class="label"><span class="label-text">Color</span></label>
+                    <select name="color" class="select select-bordered" data-testid="select-label-color">
+                        <option value="primary">Primary (Blue)</option>
+                        <option value="secondary">Secondary (Purple)</option>
+                        <option value="accent">Accent (Teal)</option>
+                        <option value="info">Info (Cyan)</option>
+                        <option value="success">Success (Green)</option>
+                        <option value="warning">Warning (Yellow)</option>
+                        <option value="error">Error (Red)</option>
+                        <option value="neutral">Neutral (Gray)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" data-testid="button-add-label">
+                    <i class="fas fa-plus mr-2"></i>Add Label
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="labels-list">
+        {% include 'partials/labels_list.html' %}
+    </div>
+</div>
+{% endblock %}

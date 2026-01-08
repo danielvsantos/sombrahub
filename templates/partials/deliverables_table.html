@@ -12,8 +12,9 @@
         <thead>
             <tr class="text-base-content/60">
                 <th>Title</th>
+                <th>Label</th>
                 <th>Status</th>
-                <th>Assignee</th>
+                <th>Assignees</th>
                 <th>Due Date</th>
                 <th class="w-16"></th>
             </tr>
@@ -22,6 +23,13 @@
             {% for deliverable in job.deliverables %}
             <tr class="hover:bg-base-300/30" data-testid="row-deliverable-{{ deliverable.id }}">
                 <td class="font-medium">{{ deliverable.title }}</td>
+                <td>
+                    {% if deliverable.label %}
+                    <span class="badge badge-{{ deliverable.label.color }} badge-sm">{{ deliverable.label.name }}</span>
+                    {% else %}
+                    <span class="text-base-content/40 text-sm">-</span>
+                    {% endif %}
+                </td>
                 <td>
                     <form hx-post="{{ url_for('update_deliverable_status', deliverable_id=deliverable.id) }}" hx-trigger="change" hx-swap="none">
                         <select name="status" class="select select-bordered select-sm bg-base-300/50 min-w-32" data-testid="select-status-{{ deliverable.id }}">
@@ -34,14 +42,19 @@
                     </form>
                 </td>
                 <td>
-                    {% if deliverable.assignee %}
-                    <div class="flex items-center gap-2">
-                        <div class="avatar placeholder">
-                            <div class="bg-purple-500/20 text-purple-400 rounded-full w-6">
-                                <span class="text-xs">{{ deliverable.assignee.username[0].upper() }}</span>
+                    {% set assignees = deliverable.all_assignees %}
+                    {% if assignees %}
+                    <div class="flex items-center -space-x-1">
+                        {% for user in assignees[:3] %}
+                        <div class="avatar placeholder" title="{{ user.full_name or user.username }}">
+                            <div class="bg-purple-500/20 text-purple-400 rounded-full w-6 border border-base-100">
+                                <span class="text-xs">{{ user.username[0].upper() }}</span>
                             </div>
                         </div>
-                        <span class="text-sm">{{ deliverable.assignee.username }}</span>
+                        {% endfor %}
+                        {% if assignees|length > 3 %}
+                        <span class="text-base-content/60 text-sm pl-2">+{{ assignees|length - 3 }}</span>
+                        {% endif %}
                     </div>
                     {% else %}
                     <span class="text-base-content/40 text-sm">Unassigned</span>
