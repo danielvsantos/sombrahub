@@ -454,17 +454,14 @@
                     const actionUrl = taskForm.dataset.actionUrl || taskForm.action;
                     const htmxTarget = taskForm.dataset.htmxTarget || '#job-kanban';
                     
-                    console.log('Submitting to:', actionUrl);
-                    console.log('Target:', htmxTarget);
-                    
                     fetch(actionUrl, {
                         method: 'POST',
-                        body: formData
+                        body: formData,
+                        headers: {
+                            'HX-Request': 'true'
+                        }
                     })
-                    .then(response => {
-                        console.log('Response status:', response.status);
-                        return response.text();
-                    })
+                    .then(response => response.text())
                     .then(html => {
                         const targetEl = document.querySelector(htmxTarget);
                         if (targetEl) {
@@ -483,7 +480,6 @@
             const submitBtn = document.getElementById('task-submit-btn');
             if (submitBtn) {
                 submitBtn.addEventListener('click', function(event) {
-                    console.log('Submit button clicked');
                     const form = document.getElementById('task-form');
                     if (form) {
                         // Manually trigger form submission
