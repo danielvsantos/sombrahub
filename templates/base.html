@@ -431,11 +431,10 @@
             
             form.setAttribute('hx-target', htmxTarget);
             form.setAttribute('hx-swap', 'innerHTML');
-            form.setAttribute('hx-trigger', 'submit');
             
-            // Remove old HTMX handlers and re-process
-            htmx.remove(form);
-            htmx.process(form);
+            // Store the current action URL for manual submission
+            form.dataset.actionUrl = form.action;
+            form.dataset.htmxTarget = htmxTarget;
             
             modal.showModal();
         }
@@ -447,10 +446,30 @@
         document.addEventListener('DOMContentLoaded', function() {
             const taskForm = document.getElementById('task-form');
             if (taskForm) {
-                taskForm.addEventListener('htmx:afterRequest', function(event) {
-                    if (event.detail.successful) {
+                // Handle form submission manually to ensure correct URL is used
+                taskForm.addEventListener('submit', function(event) {
+                    event.preventDefault();
+                    
+                    const formData = new FormData(taskForm);
+                    const actionUrl = taskForm.dataset.actionUrl || taskForm.action;
+                    const htmxTarget = taskForm.dataset.htmxTarget || '#job-kanban';
+                    
+                    fetch(actionUrl, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.text())
+                    .then(html => {
+                        const targetEl = document.querySelector(htmxTarget);
+                        if (targetEl) {
+                            targetEl.innerHTML = html;
+                            htmx.process(targetEl);
+                        }
                         closeTaskModal();
-                    }
+                    })
+                    .catch(error => {
+                        console.error('Form submission error:', error);
+                    });
                 });
             }
         });
