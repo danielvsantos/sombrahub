@@ -63,9 +63,8 @@
                                     <a href="{{ url_for('job_detail', job_id=deliverable.job_id) }}" 
                                        class="block text-xs p-1 rounded truncate 
                                               {% if deliverable.status == 'Done' %}bg-success/20 text-success
-                                              {% elif deliverable.status == 'Review' %}bg-accent/20 text-accent
-                                              {% elif deliverable.status == 'Editing' %}bg-warning/20 text-warning
-                                              {% elif deliverable.status == 'Shooting' %}bg-info/20 text-info
+                                              {% elif deliverable.status == 'Review' %}bg-warning/20 text-warning
+                                              {% elif deliverable.status == 'In Progress' %}bg-info/20 text-info
                                               {% else %}bg-base-300 text-base-content/70{% endif %}"
                                        title="{{ deliverable.title }}"
                                        data-testid="calendar-item-{{ deliverable.id }}">
@@ -94,14 +93,10 @@
             </div>
             <div class="flex items-center gap-2">
                 <div class="w-3 h-3 rounded bg-info/50"></div>
-                <span class="text-base-content/60">Shooting</span>
+                <span class="text-base-content/60">In Progress</span>
             </div>
             <div class="flex items-center gap-2">
                 <div class="w-3 h-3 rounded bg-warning/50"></div>
-                <span class="text-base-content/60">Editing</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <div class="w-3 h-3 rounded bg-accent/50"></div>
                 <span class="text-base-content/60">Review</span>
             </div>
             <div class="flex items-center gap-2">

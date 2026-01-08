@@ -21,8 +21,15 @@ else:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///agency.db'
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+    'pool_pre_ping': True,
+    'pool_recycle': 300,
+}
 
 db = SQLAlchemy(app)
+
+# Centralized task statuses - used throughout the app
+TASK_STATUSES = ['To Do', 'In Progress', 'Review', 'Done']
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'
 login_manager.login_message_category = 'info'
@@ -108,7 +115,7 @@ class DealProfitShare(db.Model):
     
     @property
     def calculated_amount(self):
-        deal = Deal.query.get(self.deal_id)
+        deal = db.session.get(Deal, self.deal_id)
         if deal:
             return (deal.profit * self.percentage / 100) + self.flat_amount
         return self.flat_amount
@@ -154,7 +161,21 @@ class Deliverable(db.Model):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
+
+
+@app.teardown_appcontext
+def shutdown_session(exception=None):
+    db.session.remove()
+
+
+@app.context_processor
+def inject_users():
+    if current_user.is_authenticated:
+        all_users = User.query.all()
+        users_json = [{'id': u.id, 'username': u.username, 'full_name': u.full_name or u.username} for u in all_users]
+        return {'all_users': all_users, 'all_users_json': users_json}
+    return {'all_users': [], 'all_users_json': []}
 
 
 @app.route('/')
@@ -576,7 +597,7 @@ def production_calendar():
 def job_detail(job_id):
     job = Job.query.get_or_404(job_id)
     users = User.query.all()
-    statuses = ['To Do', 'Shooting', 'Editing', 'Review', 'Done']
+    statuses = TASK_STATUSES
     
     deliverables_by_status = {}
     for status in statuses:
@@ -619,7 +640,7 @@ def add_deliverable(job_id):
     if request.headers.get('HX-Request'):
         if redirect_to == 'job_detail':
             users = User.query.all()
-            statuses = ['To Do', 'Shooting', 'Editing', 'Review', 'Done']
+            statuses = TASK_STATUSES
             deliverables_by_status = {}
             for s in statuses:
                 deliverables_by_status[s] = [d for d in job.deliverables if d.status == s]
@@ -631,6 +652,62 @@ def add_deliverable(job_id):
     
     if redirect_to == 'job_detail':
         return redirect(url_for('job_detail', job_id=job_id))
+    return redirect(url_for('production'))
+
+
+@app.route('/api/deliverables/<int:deliverable_id>')
+@login_required
+def get_deliverable_json(deliverable_id):
+    deliverable = Deliverable.query.get_or_404(deliverable_id)
+    return jsonify({
+        'id': deliverable.id,
+        'job_id': deliverable.job_id,
+        'title': deliverable.title,
+        'description': deliverable.description or '',
+        'status': deliverable.status,
+        'assignee_id': deliverable.assignee_id,
+        'due_date': deliverable.due_date.strftime('%Y-%m-%d') if deliverable.due_date else ''
+    })
+
+
+@app.route('/deliverables/<int:deliverable_id>/edit', methods=['POST'])
+@login_required
+def edit_deliverable(deliverable_id):
+    deliverable = Deliverable.query.get_or_404(deliverable_id)
+    job = deliverable.job
+    
+    deliverable.title = request.form.get('title', deliverable.title)
+    deliverable.description = request.form.get('description', '')
+    deliverable.status = request.form.get('status', deliverable.status)
+    
+    assignee_id = request.form.get('assignee_id')
+    deliverable.assignee_id = int(assignee_id) if assignee_id else None
+    
+    due_date_str = request.form.get('due_date')
+    if due_date_str:
+        deliverable.due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date()
+    else:
+        deliverable.due_date = None
+    
+    db.session.commit()
+    flash('Task updated successfully!', 'success')
+    
+    redirect_to = request.form.get('redirect_to', 'production')
+    
+    if request.headers.get('HX-Request'):
+        if redirect_to == 'job_detail':
+            users = User.query.all()
+            statuses = TASK_STATUSES
+            deliverables_by_status = {}
+            for s in statuses:
+                deliverables_by_status[s] = [d for d in job.deliverables if d.status == s]
+            return render_template('partials/job_kanban.html', job=job, users=users, 
+                                 statuses=statuses, deliverables_by_status=deliverables_by_status, today=date.today())
+        users = User.query.all()
+        return render_template('partials/deliverables_table.html', job=job, users=users, today=date.today())
+    
+    if redirect_to == 'job_detail':
+        return redirect(url_for('job_detail', job_id=job.id))
     return redirect(url_for('production'))
 
 
@@ -649,7 +726,7 @@ def update_deliverable_status(deliverable_id):
     if request.headers.get('HX-Request'):
         if redirect_to == 'job_detail':
             users = User.query.all()
-            statuses = ['To Do', 'Shooting', 'Editing', 'Review', 'Done']
+            statuses = TASK_STATUSES
             deliverables_by_status = {}
             for s in statuses:
                 deliverables_by_status[s] = [d for d in job.deliverables if d.status == s]
@@ -675,7 +752,7 @@ def delete_deliverable(deliverable_id):
     if request.headers.get('HX-Request'):
         if redirect_to == 'job_detail':
             users = User.query.all()
-            statuses = ['To Do', 'Shooting', 'Editing', 'Review', 'Done']
+            statuses = TASK_STATUSES
             deliverables_by_status = {}
             for s in statuses:
                 deliverables_by_status[s] = [d for d in job.deliverables if d.status == s]
@@ -759,7 +836,7 @@ def client_detail(client_id):
     for job in client.jobs:
         all_deliverables.extend(job.deliverables)
     
-    statuses = ['To Do', 'Shooting', 'Editing', 'Review', 'Done']
+    statuses = TASK_STATUSES
     deliverables_by_status = {}
     for status in statuses:
         deliverables_by_status[status] = [d for d in all_deliverables if d.status == status]
@@ -854,9 +931,9 @@ def seed_database():
         db.session.add_all([assignment1, assignment2])
         
         today = date.today()
-        deliverable1 = Deliverable(job_id=1, title='Event Coverage - 50 Photos', status='Shooting', assignee_id=2, due_date=today + timedelta(days=3))
+        deliverable1 = Deliverable(job_id=1, title='Event Coverage - 50 Photos', status='In Progress', assignee_id=2, due_date=today + timedelta(days=3))
         deliverable2 = Deliverable(job_id=1, title='Executive Headshots', status='To Do', assignee_id=3, due_date=today + timedelta(days=5))
-        deliverable3 = Deliverable(job_id=1, title='Product Display Photos', status='Editing', assignee_id=2, due_date=today + timedelta(days=1))
+        deliverable3 = Deliverable(job_id=1, title='Product Display Photos', status='In Progress', assignee_id=2, due_date=today + timedelta(days=1))
         deliverable4 = Deliverable(job_id=1, title='Social Media Teasers', status='To Do', assignee_id=None, due_date=today + timedelta(days=7))
         deliverable5 = Deliverable(job_id=1, title='Press Kit Images', status='Review', assignee_id=2, due_date=today + timedelta(days=2))
         

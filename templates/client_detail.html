@@ -125,7 +125,7 @@
             <div class="card-body">
                 <h2 class="card-title text-lg mb-4">
                     <i class="fas fa-columns text-blue-400"></i>
-                    All Deliverables
+                    All Tasks
                 </h2>
                 
                 {% if client.jobs %}
@@ -137,9 +137,8 @@
                                 <h3 class="font-semibold flex items-center gap-2 text-sm">
                                     <span class="w-2 h-2 rounded-full 
                                         {% if status == 'To Do' %}bg-gray-400
-                                        {% elif status == 'Shooting' %}bg-info
-                                        {% elif status == 'Editing' %}bg-warning
-                                        {% elif status == 'Review' %}bg-accent
+                                        {% elif status == 'In Progress' %}bg-info
+                                        {% elif status == 'Review' %}bg-warning
                                         {% else %}bg-success{% endif %}"></span>
                                     {{ status }}
                                 </h3>
@@ -190,7 +189,7 @@
                 {% else %}
                 <div class="text-center py-12 text-base-content/40">
                     <i class="fas fa-inbox text-4xl mb-3"></i>
-                    <p>No jobs or deliverables yet</p>
+                    <p>No jobs or tasks yet</p>
                     <a href="{{ url_for('deals') }}" class="btn btn-primary btn-sm mt-4 gap-2">
                         <i class="fas fa-plus"></i>
                         Create a Deal

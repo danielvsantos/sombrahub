@@ -1,4 +1,4 @@
-<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 pb-4">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pb-4">
     {% for status in statuses %}
     <div class="w-full">
         <div class="bg-base-300/50 rounded-xl p-4 min-h-48 sm:min-h-64">
@@ -6,9 +6,8 @@
                 <h3 class="font-semibold flex items-center gap-2 text-sm">
                     <span class="w-2 h-2 rounded-full 
                         {% if status == 'To Do' %}bg-gray-400
-                        {% elif status == 'Shooting' %}bg-info
-                        {% elif status == 'Editing' %}bg-warning
-                        {% elif status == 'Review' %}bg-accent
+                        {% elif status == 'In Progress' %}bg-info
+                        {% elif status == 'Review' %}bg-warning
                         {% else %}bg-success{% endif %}"></span>
                     {{ status }}
                 </h3>
@@ -50,12 +49,20 @@
                                 {% endfor %}
                             </select>
                         </form>
-                        <form hx-post="{{ url_for('delete_deliverable', deliverable_id=deliverable.id) }}" hx-target="#job-kanban" hx-swap="innerHTML" hx-confirm="Delete this deliverable?">
-                            <input type="hidden" name="redirect_to" value="job_detail">
-                            <button type="submit" class="btn btn-ghost btn-xs text-error" data-testid="button-delete-{{ deliverable.id }}">
-                                <i class="fas fa-trash text-xs"></i>
+                        <div class="flex gap-1">
+                            <button type="button" 
+                                    onclick="openEditTaskModal({{ deliverable.id }}, {{ job.id }}, 'job_detail', '#job-kanban')" 
+                                    class="btn btn-ghost btn-xs" 
+                                    data-testid="button-edit-{{ deliverable.id }}">
+                                <i class="fas fa-edit text-xs"></i>
                             </button>
-                        </form>
+                            <form hx-post="{{ url_for('delete_deliverable', deliverable_id=deliverable.id) }}" hx-target="#job-kanban" hx-swap="innerHTML" hx-confirm="Delete this task?">
+                                <input type="hidden" name="redirect_to" value="job_detail">
+                                <button type="submit" class="btn btn-ghost btn-xs text-error" data-testid="button-delete-{{ deliverable.id }}">
+                                    <i class="fas fa-trash text-xs"></i>
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
                 {% endfor %}

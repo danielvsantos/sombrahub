@@ -6,7 +6,7 @@
 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
     <div>
         <h1 class="text-3xl font-bold" data-testid="text-page-title">Production Dashboard</h1>
-        <p class="text-base-content/60 mt-1">Manage active jobs and deliverables</p>
+        <p class="text-base-content/60 mt-1">Manage active jobs and tasks</p>
     </div>
 </div>
 
@@ -53,7 +53,7 @@
             
             <div class="flex items-center gap-4">
                 <div class="text-right hidden sm:block">
-                    <p class="text-sm text-base-content/60">Deliverables</p>
+                    <p class="text-sm text-base-content/60">Tasks</p>
                     <p class="font-semibold">{{ job.deliverables|length }} items</p>
                 </div>
                 <span class="badge 
@@ -86,71 +86,4 @@
     </div>
     {% endif %}
 </div>
-
-<dialog id="add_deliverable_modal" class="modal">
-    <div class="modal-box bg-base-200 max-w-lg">
-        <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-                <i class="fas fa-times"></i>
-            </button>
-        </form>
-        <h3 class="font-bold text-xl mb-6 flex items-center gap-2">
-            <i class="fas fa-plus-circle text-blue-400"></i>
-            Add Deliverable
-        </h3>
-        
-        <form id="add-deliverable-form" method="POST" class="space-y-4">
-            <div class="form-control">
-                <label class="label">
-                    <span class="label-text">Title</span>
-                </label>
-                <input type="text" name="title" placeholder="e.g., 5 Product Photos" class="input input-bordered bg-base-300/50" required data-testid="input-deliverable-title">
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4">
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">Assignee</span>
-                    </label>
-                    <select name="assignee_id" class="select select-bordered bg-base-300/50" data-testid="select-assignee">
-                        <option value="">Unassigned</option>
-                        {% for user in users %}
-                        <option value="{{ user.id }}">{{ user.username }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">Due Date</span>
-                    </label>
-                    <input type="date" name="due_date" class="input input-bordered bg-base-300/50" data-testid="input-due-date">
-                </div>
-            </div>
-            
-            <div class="modal-action">
-                <button type="button" onclick="document.getElementById('add_deliverable_modal').close()" class="btn btn-ghost">Cancel</button>
-                <button type="submit" class="btn btn-primary gap-2">
-                    <i class="fas fa-check"></i>
-                    Add Deliverable
-                </button>
-            </div>
-        </form>
-    </div>
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-    </form>
-</dialog>
-
-<script>
-function openAddDeliverableModal(jobId) {
-    const form = document.getElementById('add-deliverable-form');
-    form.action = '/jobs/' + jobId + '/add-deliverable';
-    form.setAttribute('hx-post', '/jobs/' + jobId + '/add-deliverable');
-    form.setAttribute('hx-target', '#deliverables-' + jobId);
-    form.setAttribute('hx-swap', 'innerHTML');
-    htmx.process(form);
-    document.getElementById('add_deliverable_modal').showModal();
-}
-</script>
 {% endblock %}

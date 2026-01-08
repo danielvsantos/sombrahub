@@ -1,0 +1,73 @@
+<dialog id="task_modal" class="modal">
+    <div class="modal-box bg-base-200 max-w-lg">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                <i class="fas fa-times"></i>
+            </button>
+        </form>
+        <h3 id="task-modal-title" class="font-bold text-xl mb-6 flex items-center gap-2">
+            <i id="task-modal-icon" class="fas fa-plus-circle text-blue-400"></i>
+            <span id="task-modal-heading">Add Task</span>
+        </h3>
+        
+        <form id="task-form" method="POST" class="space-y-4">
+            <input type="hidden" id="task-redirect-to" name="redirect_to" value="job_detail">
+            <input type="hidden" id="task-job-id" name="job_id" value="">
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Title</span>
+                </label>
+                <input type="text" id="task-title" name="title" placeholder="e.g., 5 Product Photos" class="input input-bordered bg-base-300/50" required data-testid="input-task-title">
+            </div>
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Description</span>
+                </label>
+                <textarea id="task-description" name="description" class="textarea textarea-bordered bg-base-300/50" placeholder="Additional details..." data-testid="textarea-task-description"></textarea>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Status</span>
+                    </label>
+                    <select id="task-status" name="status" class="select select-bordered bg-base-300/50" data-testid="select-task-status">
+                        <option value="To Do">To Do</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Review">Review</option>
+                        <option value="Done">Done</option>
+                    </select>
+                </div>
+                
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Due Date</span>
+                    </label>
+                    <input type="date" id="task-due-date" name="due_date" class="input input-bordered bg-base-300/50" data-testid="input-task-due-date">
+                </div>
+            </div>
+            
+            <div class="form-control">
+                <label class="label">
+                    <span class="label-text">Assignee</span>
+                </label>
+                <select id="task-assignee" name="assignee_id" class="select select-bordered bg-base-300/50" data-testid="select-task-assignee">
+                    <option value="">Unassigned</option>
+                </select>
+            </div>
+            
+            <div class="modal-action">
+                <button type="button" onclick="closeTaskModal()" class="btn btn-ghost">Cancel</button>
+                <button type="submit" id="task-submit-btn" class="btn btn-primary gap-2" data-testid="button-submit-task">
+                    <i class="fas fa-check"></i>
+                    <span id="task-submit-text">Add Task</span>
+                </button>
+            </div>
+        </form>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>

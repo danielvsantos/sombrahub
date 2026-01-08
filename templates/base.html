@@ -183,7 +183,7 @@
                     </a>
                     <a href="{{ url_for('deals') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint in ['deals', 'deal_detail'] }}" data-testid="link-deals">
                         <i class="fas fa-file-invoice-dollar w-5 text-center"></i>
-                        <span>Proposals</span>
+                        <span>Deals</span>
                     </a>
                     <a href="{{ url_for('production') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint in ['production', 'job_detail'] }}" data-testid="link-production">
                         <i class="fas fa-briefcase w-5 text-center"></i>
@@ -231,6 +231,10 @@
     {% block public_content %}{% endblock %}
     {% endif %}
     
+    {% if current_user.is_authenticated %}
+    {% include "partials/task_modal.html" %}
+    {% endif %}
+    
     <script>
         document.addEventListener('htmx:afterSwap', function(event) {
             event.detail.elt.classList.add('fade-in');
@@ -246,6 +250,89 @@
             } else {
                 content.classList.add('open');
                 icon.classList.add('rotate-180');
+            }
+        }
+        
+        function openTaskModal(mode, jobId, taskData = null, redirectTo = 'job_detail', htmxTarget = '#job-kanban') {
+            const modal = document.getElementById('task_modal');
+            const form = document.getElementById('task-form');
+            const iconEl = document.getElementById('task-modal-icon');
+            const headingEl = document.getElementById('task-modal-heading');
+            const submitTextEl = document.getElementById('task-submit-text');
+            const assigneeSelect = document.getElementById('task-assignee');
+            
+            assigneeSelect.innerHTML = '<option value="">Unassigned</option>';
+            const users = {{ all_users_json | tojson | safe if all_users_json else '[]' }};
+            users.forEach(function(user) {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = user.full_name || user.username;
+                assigneeSelect.appendChild(option);
+            });
+            
+            document.getElementById('task-redirect-to').value = redirectTo;
+            document.getElementById('task-job-id').value = jobId;
+            
+            if (mode === 'add') {
+                iconEl.className = 'fas fa-plus-circle text-blue-400';
+                headingEl.textContent = 'Add Task';
+                submitTextEl.textContent = 'Add Task';
+                form.action = '/jobs/' + jobId + '/add-deliverable';
+                form.setAttribute('hx-post', '/jobs/' + jobId + '/add-deliverable');
+                
+                document.getElementById('task-title').value = '';
+                document.getElementById('task-description').value = '';
+                document.getElementById('task-status').value = 'To Do';
+                document.getElementById('task-due-date').value = '';
+                document.getElementById('task-assignee').value = '';
+            } else if (mode === 'edit' && taskData) {
+                iconEl.className = 'fas fa-edit text-blue-400';
+                headingEl.textContent = 'Edit Task';
+                submitTextEl.textContent = 'Save Changes';
+                form.action = '/deliverables/' + taskData.id + '/edit';
+                form.setAttribute('hx-post', '/deliverables/' + taskData.id + '/edit');
+                
+                document.getElementById('task-title').value = taskData.title || '';
+                document.getElementById('task-description').value = taskData.description || '';
+                document.getElementById('task-status').value = taskData.status || 'To Do';
+                document.getElementById('task-due-date').value = taskData.due_date || '';
+                document.getElementById('task-assignee').value = taskData.assignee_id || '';
+            }
+            
+            form.setAttribute('hx-target', htmxTarget);
+            form.setAttribute('hx-swap', 'innerHTML');
+            htmx.process(form);
+            modal.showModal();
+        }
+        
+        function closeTaskModal() {
+            document.getElementById('task_modal').close();
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const taskForm = document.getElementById('task-form');
+            if (taskForm) {
+                taskForm.addEventListener('htmx:afterRequest', function(event) {
+                    if (event.detail.successful) {
+                        closeTaskModal();
+                    }
+                });
+            }
+        });
+        
+        function openAddDeliverableModal(jobId) {
+            openTaskModal('add', jobId, null, 'production', '#deliverables-' + jobId);
+        }
+        
+        async function openEditTaskModal(taskId, jobId, redirectTo, htmxTarget) {
+            try {
+                const response = await fetch('/api/deliverables/' + taskId);
+                if (response.ok) {
+                    const taskData = await response.json();
+                    openTaskModal('edit', jobId, taskData, redirectTo, htmxTarget);
+                }
+            } catch (error) {
+                console.error('Failed to load task data:', error);
             }
         }
     </script>

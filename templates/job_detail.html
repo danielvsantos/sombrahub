@@ -25,9 +25,9 @@
             <span class="badge badge-lg {% if job.status == 'Active' %}badge-primary{% else %}badge-success{% endif %}">
                 {{ job.status }}
             </span>
-            <button onclick="document.getElementById('add_deliverable_modal').showModal()" class="btn btn-primary gap-2" data-testid="button-add-deliverable">
+            <button onclick="openTaskModal('add', {{ job.id }}, null, 'job_detail', '#job-kanban')" class="btn btn-primary gap-2" data-testid="button-add-deliverable">
                 <i class="fas fa-plus"></i>
-                Add Deliverable
+                Add Task
             </button>
         </div>
     </div>
@@ -38,7 +38,7 @@
         <div class="card-body">
             <h2 class="card-title text-lg mb-4">
                 <i class="fas fa-columns text-purple-400"></i>
-                Deliverables Kanban
+                Tasks Kanban
             </h2>
             
             <div id="job-kanban">
@@ -61,7 +61,7 @@
                         <span>{{ job.start_date.strftime('%b %d, %Y') }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-base-content/60">Deliverables</span>
+                        <span class="text-base-content/60">Tasks</span>
                         <span>{{ job.deliverables|length }}</span>
                     </div>
                     <div class="flex justify-between">
@@ -107,83 +107,6 @@
         {% endif %}
     </div>
 </div>
-
-<dialog id="add_deliverable_modal" class="modal">
-    <div class="modal-box bg-base-200 max-w-lg">
-        <form method="dialog">
-            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-                <i class="fas fa-times"></i>
-            </button>
-        </form>
-        <h3 class="font-bold text-xl mb-6 flex items-center gap-2">
-            <i class="fas fa-plus-circle text-blue-400"></i>
-            Add Deliverable
-        </h3>
-        
-        <form hx-post="{{ url_for('add_deliverable', job_id=job.id) }}" hx-target="#job-kanban" hx-swap="innerHTML" class="space-y-4">
-            <input type="hidden" name="redirect_to" value="job_detail">
-            
-            <div class="form-control">
-                <label class="label">
-                    <span class="label-text">Title</span>
-                </label>
-                <input type="text" name="title" placeholder="e.g., 5 Product Photos" class="input input-bordered bg-base-300/50" required data-testid="input-title">
-            </div>
-            
-            <div class="form-control">
-                <label class="label">
-                    <span class="label-text">Description</span>
-                </label>
-                <textarea name="description" class="textarea textarea-bordered bg-base-300/50" placeholder="Additional details..." data-testid="textarea-description"></textarea>
-            </div>
-            
-            <div class="grid grid-cols-2 gap-4">
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">Status</span>
-                    </label>
-                    <select name="status" class="select select-bordered bg-base-300/50" data-testid="select-status">
-                        <option value="To Do">To Do</option>
-                        <option value="Shooting">Shooting</option>
-                        <option value="Editing">Editing</option>
-                        <option value="Review">Review</option>
-                        <option value="Done">Done</option>
-                    </select>
-                </div>
-                
-                <div class="form-control">
-                    <label class="label">
-                        <span class="label-text">Due Date</span>
-                    </label>
-                    <input type="date" name="due_date" class="input input-bordered bg-base-300/50" data-testid="input-due-date">
-                </div>
-            </div>
-            
-            <div class="form-control">
-                <label class="label">
-                    <span class="label-text">Assignee</span>
-                </label>
-                <select name="assignee_id" class="select select-bordered bg-base-300/50" data-testid="select-assignee">
-                    <option value="">Unassigned</option>
-                    {% for user in users %}
-                    <option value="{{ user.id }}">{{ user.full_name or user.username }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <div class="modal-action">
-                <button type="button" onclick="document.getElementById('add_deliverable_modal').close()" class="btn btn-ghost">Cancel</button>
-                <button type="submit" class="btn btn-primary gap-2" onclick="document.getElementById('add_deliverable_modal').close()" data-testid="button-submit">
-                    <i class="fas fa-check"></i>
-                    Add Deliverable
-                </button>
-            </div>
-        </form>
-    </div>
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-    </form>
-</dialog>
 
 <dialog id="assign_user_modal" class="modal">
     <div class="modal-box bg-base-200 max-w-md">

@@ -36,7 +36,7 @@
     <div class="stat-card rounded-xl p-5" data-testid="stat-pending-deliverables">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-base-content/60 text-sm">Pending Deliverables</p>
+                <p class="text-base-content/60 text-sm">Pending Tasks</p>
                 <p class="text-3xl font-bold mt-1">{{ pending_deliverables }}</p>
             </div>
             <div class="w-12 h-12 rounded-xl bg-amber-500/20 flex items-center justify-center">
@@ -94,9 +94,8 @@
                         <td>
                             <span class="badge badge-sm 
                                 {% if task.status == 'To Do' %}badge-ghost
-                                {% elif task.status == 'Shooting' %}badge-info
-                                {% elif task.status == 'Editing' %}badge-warning
-                                {% elif task.status == 'Review' %}badge-accent
+                                {% elif task.status == 'In Progress' %}badge-info
+                                {% elif task.status == 'Review' %}badge-warning
                                 {% else %}badge-success{% endif %}">
                                 {{ task.status }}
                             </span>
@@ -128,7 +127,7 @@
             <div class="flex items-center justify-between mb-4">
                 <h2 class="card-title text-lg">
                     <i class="fas fa-history text-purple-400"></i>
-                    Recent Proposals
+                    Recent Deals
                 </h2>
                 <a href="{{ url_for('deals') }}" class="btn btn-ghost btn-sm gap-1" data-testid="link-view-all-deals">
                     View all <i class="fas fa-arrow-right text-xs"></i>
@@ -178,7 +177,7 @@
             <div class="flex items-center justify-between mb-4">
                 <h2 class="card-title text-lg">
                     <i class="fas fa-calendar-alt text-blue-400"></i>
-                    Upcoming Deliverables
+                    Upcoming Tasks
                 </h2>
                 <a href="{{ url_for('production') }}" class="btn btn-ghost btn-sm gap-1" data-testid="link-view-all-deliverables">
                     View all <i class="fas fa-arrow-right text-xs"></i>
@@ -206,9 +205,8 @@
                         {% endif %}
                         <span class="badge badge-sm 
                             {% if deliverable.status == 'To Do' %}badge-ghost
-                            {% elif deliverable.status == 'Shooting' %}badge-info
-                            {% elif deliverable.status == 'Editing' %}badge-warning
-                            {% elif deliverable.status == 'Review' %}badge-accent
+                            {% elif deliverable.status == 'In Progress' %}badge-info
+                            {% elif deliverable.status == 'Review' %}badge-warning
                             {% else %}badge-success{% endif %}">
                             {{ deliverable.status }}
                         </span>
@@ -234,7 +232,7 @@
                     <i class="fas fa-plus text-purple-400"></i>
                 </div>
                 <div>
-                    <h3 class="font-semibold">Add New Proposal</h3>
+                    <h3 class="font-semibold">Add New Deal</h3>
                     <p class="text-sm text-base-content/60">Start a new opportunity</p>
                 </div>
             </div>

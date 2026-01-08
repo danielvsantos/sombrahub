@@ -1,5 +1,5 @@
 <div class="flex items-center justify-between mb-4">
-    <h4 class="font-semibold text-base-content/80">Deliverables</h4>
+    <h4 class="font-semibold text-base-content/80">Tasks</h4>
     <button onclick="openAddDeliverableModal({{ job.id }})" class="btn btn-sm btn-primary gap-1" data-testid="button-add-deliverable-{{ job.id }}">
         <i class="fas fa-plus text-xs"></i>
         Add
@@ -25,7 +25,7 @@
                 <td>
                     <form hx-post="{{ url_for('update_deliverable_status', deliverable_id=deliverable.id) }}" hx-trigger="change" hx-swap="none">
                         <select name="status" class="select select-bordered select-sm bg-base-300/50 min-w-32" data-testid="select-status-{{ deliverable.id }}">
-                            {% for status in ['To Do', 'Shooting', 'Editing', 'Review', 'Done'] %}
+                            {% for status in ['To Do', 'In Progress', 'Review', 'Done'] %}
                             <option value="{{ status }}" {% if deliverable.status == status %}selected{% endif %}>
                                 {{ status }}
                             </option>
@@ -57,11 +57,19 @@
                     {% endif %}
                 </td>
                 <td>
-                    <form hx-post="{{ url_for('delete_deliverable', deliverable_id=deliverable.id) }}" hx-target="#deliverables-{{ job.id }}" hx-swap="innerHTML" hx-confirm="Delete this deliverable?">
-                        <button type="submit" class="btn btn-ghost btn-xs text-error" data-testid="button-delete-{{ deliverable.id }}">
-                            <i class="fas fa-trash"></i>
+                    <div class="flex gap-1">
+                        <button type="button" 
+                                onclick="openEditTaskModal({{ deliverable.id }}, {{ job.id }}, 'production', '#deliverables-{{ job.id }}')" 
+                                class="btn btn-ghost btn-xs" 
+                                data-testid="button-edit-{{ deliverable.id }}">
+                            <i class="fas fa-edit"></i>
                         </button>
-                    </form>
+                        <form hx-post="{{ url_for('delete_deliverable', deliverable_id=deliverable.id) }}" hx-target="#deliverables-{{ job.id }}" hx-swap="innerHTML" hx-confirm="Delete this task?">
+                            <button type="submit" class="btn btn-ghost btn-xs text-error" data-testid="button-delete-{{ deliverable.id }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
                 </td>
             </tr>
             {% endfor %}
@@ -71,10 +79,10 @@
 {% else %}
 <div class="text-center py-8 text-base-content/40 bg-base-300/30 rounded-lg">
     <i class="fas fa-tasks text-3xl mb-2"></i>
-    <p class="text-sm">No deliverables yet</p>
+    <p class="text-sm">No tasks yet</p>
     <button onclick="openAddDeliverableModal({{ job.id }})" class="btn btn-sm btn-ghost mt-2 gap-1">
         <i class="fas fa-plus text-xs"></i>
-        Add your first deliverable
+        Add your first task
     </button>
 </div>
 {% endif %}
