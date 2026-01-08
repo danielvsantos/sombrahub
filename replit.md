@@ -51,6 +51,7 @@ Sombra Hub is a full-stack web application for managing Sombra Lab's sales and p
    - Add/edit/delete tasks with HTMX and unified modal
    - Team assignment management
    - View linked deal information
+   - **File Attachments**: Upload files to tasks (images, PDFs, Office docs, PSD, AI, video - max 16MB)
 
 6. **Production Calendar**
    - Monthly calendar view of all tasks by due date
@@ -80,7 +81,7 @@ Sombra Hub is a full-stack web application for managing Sombra Lab's sales and p
 - **DealProfitShare**: id, deal_id, user_id, percentage, flat_amount
 - **Job**: id, client_id, deal_id, title, status, start_date, is_retainer
 - **JobAssignment**: id, job_id, user_id, role
-- **Deliverable** (displayed as "Task"): id, job_id, title, description, status, assignee_id, due_date
+- **Deliverable** (displayed as "Task"): id, job_id, title, description, status, assignee_id, due_date, label_id, file_name, file_original_name
 
 ## Demo Credentials
 
