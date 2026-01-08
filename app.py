@@ -516,7 +516,7 @@ def add_deal():
     cost_internal = float(request.form.get('cost_internal', 0) or 0)
     cost_external = float(request.form.get('cost_external', 0) or 0)
     stage = request.form.get('stage', 'New')
-    is_recurring = request.form.get('is_recurring') == 'on'
+    is_recurring = 'on' in request.form.getlist('is_recurring')
     notes = request.form.get('notes', '')
     
     deal = Deal(
@@ -567,7 +567,7 @@ def edit_deal(deal_id):
     deal.value = float(request.form.get('value', deal.value) or 0)
     deal.cost_internal = float(request.form.get('cost_internal', deal.cost_internal) or 0)
     deal.cost_external = float(request.form.get('cost_external', deal.cost_external) or 0)
-    deal.is_recurring = request.form.get('is_recurring') == 'on'
+    deal.is_recurring = 'on' in request.form.getlist('is_recurring')
     deal.notes = request.form.get('notes', '')
     
     if old_title != new_title:
