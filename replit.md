@@ -2,7 +2,7 @@
 
 ## Overview
 
-Sombra Hub is a full-stack web application for managing Sombra Lab's sales and production workflows. It combines a Sales CRM (deals board) with Production Management (jobs and deliverables tracking).
+Sombra Hub is a full-stack web application for managing Sombra Lab's sales and production workflows. It combines a Sales CRM (deals board) with Production Management (jobs and tasks tracking).
 
 **Tech Stack:**
 - Backend: Python Flask with SQLAlchemy ORM
@@ -38,25 +38,25 @@ Sombra Hub is a full-stack web application for managing Sombra Lab's sales and p
 
 4. **Production Dashboard**
    - Accordion-style job cards showing active jobs
-   - Deliverables table per job with status tracking
-   - Deliverable statuses: To Do, Shooting, Editing, Review, Done
+   - Tasks table per job with status tracking
+   - Task statuses: To Do, In Progress, Review, Done
    - Assignee management
    - Due date tracking with overdue highlighting
    - Job completion workflow
    - Click on job title to view detailed job page with kanban
 
 5. **Job Detail Page**
-   - Kanban view of deliverables organized by status
-   - Add/edit/delete deliverables with HTMX
+   - Kanban view of tasks organized by status
+   - Add/edit/delete tasks with HTMX and unified modal
    - Team assignment management
    - View linked deal information
 
 6. **Production Calendar**
-   - Monthly calendar view of all deliverables by due date
+   - Monthly calendar view of all tasks by due date
    - Filter by specific job
    - Color-coded status indicators
    - Navigate between months
-   - Click on deliverable to view job detail
+   - Click on task to view job detail
 
 7. **Clients Management**
    - Client database with contact info (email, phone, address)
@@ -68,7 +68,7 @@ Sombra Hub is a full-stack web application for managing Sombra Lab's sales and p
    - Full contact information display
    - Stats overview (total deals, active jobs, total value)
    - Related deals list with links
-   - Kanban view of all deliverables across all client jobs
+   - Kanban view of all tasks across all client jobs
    - Edit client information
 
 ## Database Models
@@ -79,7 +79,7 @@ Sombra Hub is a full-stack web application for managing Sombra Lab's sales and p
 - **DealProfitShare**: id, deal_id, user_id, percentage, flat_amount
 - **Job**: id, client_id, deal_id, title, status, start_date, is_retainer
 - **JobAssignment**: id, job_id, user_id, role
-- **Deliverable**: id, job_id, title, description, status, assignee_id, due_date
+- **Deliverable** (displayed as "Task"): id, job_id, title, description, status, assignee_id, due_date
 
 ## Demo Credentials
 
@@ -92,13 +92,13 @@ Sombra Hub is a full-stack web application for managing Sombra Lab's sales and p
 ```
 app.py                 # Main Flask application with all routes and models
 templates/
-  base.html            # Base layout with sidebar navigation
+  base.html            # Base layout with sidebar navigation + unified task modal
   login.html           # Login page
   dashboard.html       # Dashboard with stats and quick links
   deals.html           # Deals kanban board
   deal_detail.html     # Deal detail with costs and profit shares
   production.html      # Production jobs with accordion UI
-  production_calendar.html  # Calendar view of deliverables
+  production_calendar.html  # Calendar view of tasks
   job_detail.html      # Job kanban view
   clients.html         # Clients grid view
   client_detail.html   # Client detail with info and kanban
@@ -106,12 +106,13 @@ templates/
   user_edit.html       # Edit user form
   partials/
     deals_board.html   # Kanban columns partial
-    deliverables_table.html  # Job deliverables table partial
+    deliverables_table.html  # Job tasks table partial
+    task_modal.html    # Unified add/edit task modal
     clients_list.html  # Clients grid partial
     status_badge.html  # Status badge partial
     users_list.html    # Users table partial
     profit_shares.html # Profit shares table partial
-    job_kanban.html    # Job deliverables kanban partial
+    job_kanban.html    # Job tasks kanban partial
     job_assignments.html  # Job team assignments partial
     calendar_grid.html # Calendar month grid partial
 ```
@@ -122,6 +123,30 @@ The application runs on port 5000:
 ```bash
 python app.py
 ```
+
+## Architecture Notes
+
+### Task Status System
+Task statuses are centralized via `TASK_STATUSES` constant in app.py:
+- "To Do" - New tasks not yet started
+- "In Progress" - Tasks currently being worked on
+- "Review" - Tasks awaiting review/approval
+- "Done" - Completed tasks
+
+### Unified Task Modal
+The task add/edit modal is defined once in `partials/task_modal.html` and included in `base.html`. JavaScript functions control its behavior:
+- `openTaskModal(mode, jobId, taskData, redirectTo, htmxTarget)` - Opens modal for add/edit
+- `openEditTaskModal(taskId, jobId, redirectTo, htmxTarget)` - Fetches task data and opens edit modal
+- `openAddDeliverableModal(jobId)` - Wrapper for production page compatibility
+
+### Context Processor
+`inject_users()` provides `all_users` (User objects) and `all_users_json` (serialized list) to all templates for populating assignee dropdowns.
+
+### Database Connection Pooling
+SQLAlchemy engine is configured with:
+- `pool_pre_ping=True` - Validates connections before use
+- `pool_recycle=300` - Recycles connections every 5 minutes
+- `@app.teardown_appcontext` - Properly cleans up sessions
 
 ## Design Choices
 
@@ -174,3 +199,11 @@ Replit provides point-in-time restore for production databases if you need to re
 
 - `DATABASE_URL`: Automatically set by Replit for PostgreSQL connection
 - `SESSION_SECRET`: Should be set in Secrets for secure session management
+
+## Pending Features
+
+- Multi-assignee support for tasks
+- File upload capability for tasks
+- Labels/tags system with admin management
+- Role-based access control for clients/deals (admin only)
+- Drag-and-drop for kanban task management
