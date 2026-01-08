@@ -756,14 +756,21 @@ def production_calendar():
 def job_detail(job_id):
     job = Job.query.get_or_404(job_id)
     users = User.query.all()
+    labels = Label.query.all()
     statuses = TASK_STATUSES
+    
+    selected_label_id = request.args.get('label_id', type=int)
     
     deliverables_by_status = {}
     for status in statuses:
-        deliverables_by_status[status] = [d for d in job.deliverables if d.status == status]
+        filtered = [d for d in job.deliverables if d.status == status]
+        if selected_label_id:
+            filtered = [d for d in filtered if d.label_id == selected_label_id]
+        deliverables_by_status[status] = filtered
     
-    return render_template('job_detail.html', job=job, users=users, statuses=statuses, 
-                         deliverables_by_status=deliverables_by_status, today=date.today())
+    return render_template('job_detail.html', job=job, users=users, labels=labels, statuses=statuses, 
+                         deliverables_by_status=deliverables_by_status, today=date.today(),
+                         selected_label_id=selected_label_id)
 
 
 @app.route('/jobs/<int:job_id>/add-deliverable', methods=['POST'])

@@ -29,104 +29,12 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-    <div class="space-y-6">
-        <div class="card bg-base-200 shadow-lg">
-            <div class="card-body">
-                <h2 class="card-title text-lg mb-4">
-                    <i class="fas fa-address-card text-blue-400"></i>
-                    Contact Info
-                </h2>
-                
-                <div class="space-y-3 text-sm">
-                    {% if client.email %}
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-envelope text-base-content/40 w-4"></i>
-                        <a href="mailto:{{ client.email }}" class="text-primary hover:underline">{{ client.email }}</a>
-                    </div>
-                    {% endif %}
-                    {% if client.phone %}
-                    <div class="flex items-center gap-3">
-                        <i class="fas fa-phone text-base-content/40 w-4"></i>
-                        <span>{{ client.phone }}</span>
-                    </div>
-                    {% endif %}
-                    {% if client.address %}
-                    <div class="flex items-start gap-3">
-                        <i class="fas fa-map-marker-alt text-base-content/40 w-4 mt-1"></i>
-                        <span>{{ client.address }}</span>
-                    </div>
-                    {% endif %}
-                    {% if client.notes %}
-                    <div class="divider my-2"></div>
-                    <p class="text-base-content/60">{{ client.notes }}</p>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
-        <div class="card bg-base-200 shadow-lg">
-            <div class="card-body">
-                <h2 class="card-title text-lg mb-4">
-                    <i class="fas fa-chart-bar text-purple-400"></i>
-                    Stats
-                </h2>
-                
-                <div class="space-y-3 text-sm">
-                    <div class="flex justify-between">
-                        <span class="text-base-content/60">Total Deals</span>
-                        <span class="font-semibold">{{ client.deals|length }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-base-content/60">Active Jobs</span>
-                        <span class="font-semibold">{{ client.jobs|selectattr('status', 'equalto', 'Active')|list|length }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-base-content/60">Total Value</span>
-                        <span class="font-semibold text-success">${{ "{:,.0f}".format(client.deals|sum(attribute='value')) }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        {% if client.deals %}
-        <div class="card bg-base-200 shadow-lg">
-            <div class="card-body">
-                <h2 class="card-title text-lg mb-4">
-                    <i class="fas fa-handshake text-green-400"></i>
-                    Deals
-                </h2>
-                
-                <div class="space-y-2">
-                    {% for deal in client.deals %}
-                    <a href="{{ url_for('deal_detail', deal_id=deal.id) }}" 
-                       class="block p-2 rounded-lg bg-base-300/50 hover:bg-base-300 transition-colors" 
-                       data-testid="link-deal-{{ deal.id }}">
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm font-medium truncate">{{ deal.title }}</span>
-                            <span class="badge badge-sm 
-                                {% if deal.stage == 'Won' %}badge-success
-                                {% elif deal.stage == 'Lost' %}badge-error
-                                {% else %}badge-ghost{% endif %}">
-                                {{ deal.stage }}
-                            </span>
-                        </div>
-                        <p class="text-xs text-base-content/60 mt-1">${{ "{:,.0f}".format(deal.value) }}</p>
-                    </a>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        {% endif %}
-    </div>
-    
-    <div class="lg:col-span-3">
-        <div class="card bg-base-200 shadow-lg">
-            <div class="card-body">
-                <h2 class="card-title text-lg mb-4">
-                    <i class="fas fa-columns text-blue-400"></i>
-                    All Tasks
-                </h2>
+<div class="card bg-base-200 shadow-lg mb-6">
+    <div class="card-body">
+        <h2 class="card-title text-lg mb-4">
+            <i class="fas fa-columns text-blue-400"></i>
+            All Tasks
+        </h2>
                 
                 {% if client.jobs %}
                 <div class="flex gap-4 overflow-x-auto pb-4">
@@ -196,9 +104,97 @@
                     </a>
                 </div>
                 {% endif %}
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="card bg-base-200 shadow-lg">
+        <div class="card-body">
+            <h2 class="card-title text-lg mb-4">
+                <i class="fas fa-address-card text-blue-400"></i>
+                Contact Info
+            </h2>
+            
+            <div class="space-y-3 text-sm">
+                {% if client.email %}
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-envelope text-base-content/40 w-4"></i>
+                    <a href="mailto:{{ client.email }}" class="text-primary hover:underline">{{ client.email }}</a>
+                </div>
+                {% endif %}
+                {% if client.phone %}
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-phone text-base-content/40 w-4"></i>
+                    <span>{{ client.phone }}</span>
+                </div>
+                {% endif %}
+                {% if client.address %}
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-map-marker-alt text-base-content/40 w-4 mt-1"></i>
+                    <span>{{ client.address }}</span>
+                </div>
+                {% endif %}
+                {% if client.notes %}
+                <div class="divider my-2"></div>
+                <p class="text-base-content/60">{{ client.notes }}</p>
+                {% endif %}
             </div>
         </div>
     </div>
+    
+    <div class="card bg-base-200 shadow-lg">
+        <div class="card-body">
+            <h2 class="card-title text-lg mb-4">
+                <i class="fas fa-chart-bar text-purple-400"></i>
+                Stats
+            </h2>
+            
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-base-content/60">Total Deals</span>
+                    <span class="font-semibold">{{ client.deals|length }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-base-content/60">Active Jobs</span>
+                    <span class="font-semibold">{{ client.jobs|selectattr('status', 'equalto', 'Active')|list|length }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-base-content/60">Total Value</span>
+                    <span class="font-semibold text-success">${{ "{:,.0f}".format(client.deals|sum(attribute='value')) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if client.deals %}
+    <div class="card bg-base-200 shadow-lg">
+        <div class="card-body">
+            <h2 class="card-title text-lg mb-4">
+                <i class="fas fa-handshake text-green-400"></i>
+                Deals
+            </h2>
+            
+            <div class="space-y-2 max-h-48 overflow-y-auto">
+                {% for deal in client.deals %}
+                <a href="{{ url_for('deal_detail', deal_id=deal.id) }}" 
+                   class="block p-2 rounded-lg bg-base-300/50 hover:bg-base-300 transition-colors" 
+                   data-testid="link-deal-{{ deal.id }}">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium truncate">{{ deal.title }}</span>
+                        <span class="badge badge-sm 
+                            {% if deal.stage == 'Won' %}badge-success
+                            {% elif deal.stage == 'Lost' %}badge-error
+                            {% else %}badge-ghost{% endif %}">
+                            {{ deal.stage }}
+                        </span>
+                    </div>
+                    <p class="text-xs text-base-content/60 mt-1">${{ "{:,.0f}".format(deal.value) }}</p>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 <dialog id="edit_client_modal" class="modal">

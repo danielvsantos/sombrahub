@@ -1,7 +1,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pb-4">
     {% for status in statuses %}
     <div class="w-full">
-        <div class="bg-base-300/50 rounded-xl p-4 min-h-48 sm:min-h-64">
+        <div class="bg-base-300/50 rounded-xl p-4 min-h-48 sm:min-h-64 kanban-column" data-status="{{ status }}">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="font-semibold flex items-center gap-2 text-sm">
                     <span class="w-2 h-2 rounded-full 
@@ -14,9 +14,13 @@
                 <span class="badge badge-ghost badge-sm">{{ deliverables_by_status[status]|length }}</span>
             </div>
             
-            <div class="space-y-2">
+            <div class="space-y-2 kanban-cards min-h-16" data-status="{{ status }}">
                 {% for deliverable in deliverables_by_status[status] %}
-                <div class="bg-base-100 rounded-lg p-3 border border-base-300 hover:border-purple-500/50 transition-colors" data-testid="card-deliverable-{{ deliverable.id }}">
+                <div class="bg-base-100 rounded-lg p-3 border border-base-300 hover:border-purple-500/50 transition-colors cursor-grab active:cursor-grabbing kanban-card" 
+                     draggable="true" 
+                     data-deliverable-id="{{ deliverable.id }}" 
+                     data-job-id="{{ job.id }}"
+                     data-testid="card-deliverable-{{ deliverable.id }}">
                     <p class="font-medium text-sm mb-2">{{ deliverable.title }}</p>
                     
                     {% if deliverable.label %}

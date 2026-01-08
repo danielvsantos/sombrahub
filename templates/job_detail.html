@@ -33,79 +33,101 @@
     </div>
 </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
-    <div class="card bg-base-200 shadow-lg lg:col-span-3">
-        <div class="card-body">
-            <h2 class="card-title text-lg mb-4">
+<div class="card bg-base-200 shadow-lg mb-6">
+    <div class="card-body">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+            <h2 class="card-title text-lg">
                 <i class="fas fa-columns text-purple-400"></i>
                 Tasks Kanban
             </h2>
+            <div class="flex items-center gap-2">
+                <span class="text-sm text-base-content/60">Filter by label:</span>
+                <select id="label-filter" 
+                        hx-get="{{ url_for('job_detail', job_id=job.id) }}" 
+                        hx-target="#job-kanban" 
+                        hx-select="#job-kanban > *"
+                        hx-swap="innerHTML"
+                        hx-trigger="change"
+                        hx-include="[name='label_id']"
+                        name="label_id"
+                        class="select select-bordered select-sm bg-base-300/50" 
+                        data-testid="select-label-filter">
+                    <option value="">All Labels</option>
+                    {% for label in labels %}
+                    <option value="{{ label.id }}" {% if selected_label_id == label.id %}selected{% endif %}>{{ label.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div id="job-kanban">
+            {% include "partials/job_kanban.html" %}
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+    <div class="card bg-base-200 shadow-lg">
+        <div class="card-body">
+            <h2 class="card-title text-lg mb-4">
+                <i class="fas fa-info-circle text-blue-400"></i>
+                Job Info
+            </h2>
             
-            <div id="job-kanban">
-                {% include "partials/job_kanban.html" %}
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-base-content/60">Started</span>
+                    <span>{{ job.start_date.strftime('%b %d, %Y') }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-base-content/60">Tasks</span>
+                    <span>{{ job.deliverables|length }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-base-content/60">Completed</span>
+                    <span>{{ job.deliverables|selectattr('status', 'equalto', 'Done')|list|length }}</span>
+                </div>
+                {% if job.deal %}
+                <div class="divider my-2"></div>
+                <a href="{{ url_for('deal_detail', deal_id=job.deal_id) }}" class="btn btn-ghost btn-sm w-full gap-2">
+                    <i class="fas fa-handshake"></i>
+                    View Deal
+                </a>
+                {% endif %}
             </div>
         </div>
     </div>
     
-    <div class="space-y-6">
-        <div class="card bg-base-200 shadow-lg">
-            <div class="card-body">
-                <h2 class="card-title text-lg mb-4">
-                    <i class="fas fa-info-circle text-blue-400"></i>
-                    Job Info
+    <div class="card bg-base-200 shadow-lg">
+        <div class="card-body">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="card-title text-lg">
+                    <i class="fas fa-users text-green-400"></i>
+                    Team
                 </h2>
-                
-                <div class="space-y-3 text-sm">
-                    <div class="flex justify-between">
-                        <span class="text-base-content/60">Started</span>
-                        <span>{{ job.start_date.strftime('%b %d, %Y') }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-base-content/60">Tasks</span>
-                        <span>{{ job.deliverables|length }}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-base-content/60">Completed</span>
-                        <span>{{ job.deliverables|selectattr('status', 'equalto', 'Done')|list|length }}</span>
-                    </div>
-                    {% if job.deal %}
-                    <div class="divider my-2"></div>
-                    <a href="{{ url_for('deal_detail', deal_id=job.deal_id) }}" class="btn btn-ghost btn-sm w-full gap-2">
-                        <i class="fas fa-handshake"></i>
-                        View Deal
-                    </a>
-                    {% endif %}
-                </div>
+                <button onclick="document.getElementById('assign_user_modal').showModal()" class="btn btn-ghost btn-xs" data-testid="button-assign-user">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+            
+            <div id="job-assignments">
+                {% include "partials/job_assignments.html" %}
             </div>
         </div>
-        
-        <div class="card bg-base-200 shadow-lg">
-            <div class="card-body">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="card-title text-lg">
-                        <i class="fas fa-users text-green-400"></i>
-                        Team
-                    </h2>
-                    <button onclick="document.getElementById('assign_user_modal').showModal()" class="btn btn-ghost btn-xs" data-testid="button-assign-user">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                </div>
-                
-                <div id="job-assignments">
-                    {% include "partials/job_assignments.html" %}
-                </div>
-            </div>
-        </div>
-        
-        {% if job.status == 'Active' %}
-        <form action="{{ url_for('complete_job', job_id=job.id) }}" method="POST">
-            <button type="submit" class="btn btn-success w-full gap-2" data-testid="button-complete-job">
-                <i class="fas fa-check-circle"></i>
-                Mark Job Complete
-            </button>
-        </form>
-        {% endif %}
     </div>
+    
+    {% if job.status == 'Active' %}
+    <div class="card bg-base-200 shadow-lg">
+        <div class="card-body flex flex-col justify-center">
+            <form action="{{ url_for('complete_job', job_id=job.id) }}" method="POST">
+                <button type="submit" class="btn btn-success w-full gap-2" data-testid="button-complete-job">
+                    <i class="fas fa-check-circle"></i>
+                    Mark Job Complete
+                </button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
 <dialog id="assign_user_modal" class="modal">

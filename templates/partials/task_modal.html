@@ -66,6 +66,39 @@
                 </div>
             </div>
             
+            <div id="task-file-section" class="hidden">
+                <label class="label">
+                    <span class="label-text">File Attachment</span>
+                </label>
+                
+                <div id="task-file-display" class="hidden mb-3">
+                    <div class="flex items-center gap-3 bg-base-300/50 rounded-lg p-3">
+                        <i id="task-file-icon" class="fas fa-file text-lg text-primary"></i>
+                        <div class="flex-1 min-w-0">
+                            <a id="task-file-link" href="#" class="text-sm font-medium hover:text-primary truncate block" target="_blank" data-testid="link-task-file">
+                                <span id="task-file-name">filename.pdf</span>
+                            </a>
+                        </div>
+                        <form id="task-file-delete-form" method="POST" class="inline">
+                            <input type="hidden" name="redirect_to" value="job_detail">
+                            <button type="submit" class="btn btn-ghost btn-xs text-error" data-testid="button-delete-file">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                
+                <form id="task-file-upload-form" method="POST" enctype="multipart/form-data" class="flex items-center gap-2">
+                    <input type="hidden" name="redirect_to" value="job_detail">
+                    <input type="file" name="file" class="file-input file-input-bordered file-input-sm bg-base-300/50 flex-1" data-testid="input-task-file">
+                    <button type="submit" class="btn btn-sm btn-primary gap-1" data-testid="button-upload-file">
+                        <i class="fas fa-upload"></i>
+                        Upload
+                    </button>
+                </form>
+                <p class="text-xs text-base-content/50 mt-2">Supported: images, PDF, Word, Excel, PSD, AI, video (max 16MB)</p>
+            </div>
+            
             <div class="modal-action">
                 <button type="button" onclick="closeTaskModal()" class="btn btn-ghost">Cancel</button>
                 <button type="submit" id="task-submit-btn" class="btn btn-primary gap-2" data-testid="button-submit-task">
@@ -74,39 +107,6 @@
                 </button>
             </div>
         </form>
-        
-        <div id="task-file-section" class="hidden border-t border-base-300 mt-4 pt-4">
-            <label class="label">
-                <span class="label-text font-medium">File Attachment</span>
-            </label>
-            
-            <div id="task-file-display" class="hidden mb-3">
-                <div class="flex items-center gap-3 bg-base-300/50 rounded-lg p-3">
-                    <i id="task-file-icon" class="fas fa-file text-lg text-primary"></i>
-                    <div class="flex-1 min-w-0">
-                        <a id="task-file-link" href="#" class="text-sm font-medium hover:text-primary truncate block" target="_blank" data-testid="link-task-file">
-                            <span id="task-file-name">filename.pdf</span>
-                        </a>
-                    </div>
-                    <form id="task-file-delete-form" method="POST" class="inline">
-                        <input type="hidden" name="redirect_to" value="job_detail">
-                        <button type="submit" class="btn btn-ghost btn-xs text-error" data-testid="button-delete-file">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
-            
-            <form id="task-file-upload-form" method="POST" enctype="multipart/form-data" class="flex items-center gap-2">
-                <input type="hidden" name="redirect_to" value="job_detail">
-                <input type="file" name="file" class="file-input file-input-bordered file-input-sm bg-base-300/50 flex-1" data-testid="input-task-file">
-                <button type="submit" class="btn btn-sm btn-primary gap-1" data-testid="button-upload-file">
-                    <i class="fas fa-upload"></i>
-                    Upload
-                </button>
-            </form>
-            <p class="text-xs text-base-content/50 mt-2">Supported: images, PDF, Word, Excel, PSD, AI, video (max 16MB)</p>
-        </div>
     </div>
     <form method="dialog" class="modal-backdrop">
         <button>close</button>

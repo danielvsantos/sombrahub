@@ -400,6 +400,97 @@
                 console.error('Failed to load task data:', error);
             }
         }
+        
+        // Drag and Drop for Kanban
+        let draggedCard = null;
+        
+        function initKanbanDragDrop() {
+            const kanbanContainer = document.getElementById('job-kanban');
+            if (!kanbanContainer) return;
+            
+            // Use event delegation for drag events
+            kanbanContainer.addEventListener('dragstart', function(e) {
+                if (e.target.classList.contains('kanban-card')) {
+                    draggedCard = e.target;
+                    e.target.classList.add('opacity-50');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', e.target.dataset.deliverableId);
+                }
+            });
+            
+            kanbanContainer.addEventListener('dragend', function(e) {
+                if (e.target.classList.contains('kanban-card')) {
+                    e.target.classList.remove('opacity-50');
+                    draggedCard = null;
+                    // Remove all drag-over styling
+                    document.querySelectorAll('.kanban-cards').forEach(col => {
+                        col.classList.remove('bg-purple-500/10', 'border-2', 'border-dashed', 'border-purple-500/50');
+                    });
+                }
+            });
+            
+            kanbanContainer.addEventListener('dragover', function(e) {
+                const dropZone = e.target.closest('.kanban-cards');
+                if (dropZone && draggedCard) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    dropZone.classList.add('bg-purple-500/10', 'border-2', 'border-dashed', 'border-purple-500/50');
+                }
+            });
+            
+            kanbanContainer.addEventListener('dragleave', function(e) {
+                const dropZone = e.target.closest('.kanban-cards');
+                if (dropZone && !dropZone.contains(e.relatedTarget)) {
+                    dropZone.classList.remove('bg-purple-500/10', 'border-2', 'border-dashed', 'border-purple-500/50');
+                }
+            });
+            
+            kanbanContainer.addEventListener('drop', async function(e) {
+                const dropZone = e.target.closest('.kanban-cards');
+                if (dropZone && draggedCard) {
+                    e.preventDefault();
+                    dropZone.classList.remove('bg-purple-500/10', 'border-2', 'border-dashed', 'border-purple-500/50');
+                    
+                    const deliverableId = draggedCard.dataset.deliverableId;
+                    const newStatus = dropZone.dataset.status;
+                    const currentStatus = draggedCard.closest('.kanban-cards').dataset.status;
+                    
+                    if (newStatus !== currentStatus) {
+                        // Move card visually first
+                        dropZone.appendChild(draggedCard);
+                        
+                        // Update status via POST
+                        const formData = new FormData();
+                        formData.append('status', newStatus);
+                        formData.append('redirect_to', 'job_detail');
+                        
+                        try {
+                            const response = await fetch('/deliverables/' + deliverableId + '/status', {
+                                method: 'POST',
+                                body: formData
+                            });
+                            
+                            if (response.ok) {
+                                // Refresh the kanban via HTMX
+                                htmx.trigger('#job-kanban', 'refresh');
+                                const jobId = draggedCard.dataset.jobId;
+                                htmx.ajax('GET', '/jobs/' + jobId, {target: '#job-kanban', select: '#job-kanban > *', swap: 'innerHTML'});
+                            }
+                        } catch (error) {
+                            console.error('Failed to update task status:', error);
+                        }
+                    }
+                }
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', initKanbanDragDrop);
+        // Re-init after HTMX swaps
+        document.body.addEventListener('htmx:afterSwap', function(e) {
+            if (e.target.id === 'job-kanban') {
+                initKanbanDragDrop();
+            }
+        });
     </script>
 </body>
 </html>
