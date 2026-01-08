@@ -8,7 +8,7 @@ Sombra Hub is a full-stack web application for managing Sombra Lab's sales and p
 - Backend: Python Flask with SQLAlchemy ORM
 - Database: PostgreSQL (Replit built-in, with separate dev/prod databases)
 - Frontend: Server-side rendered HTML with Jinja2 templates
-- Styling: TailwindCSS + DaisyUI (dark theme via CDN)
+- Styling: TailwindCSS + DaisyUI (light "corporate" theme via CDN, dark sidebar for branding)
 - Interactivity: HTMX for dynamic updates without page reloads
 - Authentication: Flask-Login
 - Icons: Font Awesome
@@ -29,8 +29,9 @@ Sombra Hub is a full-stack web application for managing Sombra Lab's sales and p
 
 3. **Deals Board (Sales CRM)**
    - Kanban-style board with 5 stages: New, Proposal, Negotiation, Won, Lost
+   - **Drag-and-Drop**: Move deals between stages with native HTML5 drag-and-drop
    - Create new deals with client, value, and notes
-   - Move deals between stages via dropdown menu
+   - Edit/delete icons on deal cards for quick actions
    - **Cost Tracking**: Internal cost, external cost, profit calculation
    - **Profit Sharing**: Allocate profit percentages and flat amounts to team members
    - Recurring/retainer deal tracking with special badges
@@ -70,6 +71,7 @@ Sombra Hub is a full-stack web application for managing Sombra Lab's sales and p
 
 8. **Client Detail Page**
    - Full-width kanban view of all tasks across all client jobs (at top)
+   - **Drag-and-Drop**: Move tasks between status columns with native HTML5 drag-and-drop
    - Contact Info, Stats, and Deals summary boxes in 3-column grid below
    - Stats overview (total deals, active jobs, total value)
    - Related deals list with links
