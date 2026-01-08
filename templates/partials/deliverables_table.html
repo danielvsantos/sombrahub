@@ -72,7 +72,7 @@
                 </td>
                 <td>
                     {% if deliverable.file_name %}
-                    <a href="{{ url_for('get_deliverable_file', deliverable_id=deliverable.id) }}" class="btn btn-ghost btn-xs text-primary" title="{{ deliverable.file_original_name }}" target="_blank" data-testid="link-file-{{ deliverable.id }}">
+                    <a href="{{ url_for('download_file', deliverable_id=deliverable.id) }}" class="btn btn-ghost btn-xs text-primary" title="{{ deliverable.file_original_name }}" target="_blank" data-testid="link-file-{{ deliverable.id }}">
                         <i class="fas fa-paperclip"></i>
                     </a>
                     {% else %}
