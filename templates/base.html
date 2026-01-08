@@ -249,7 +249,7 @@
                     {% endif %}
                     
                     {% if current_user.role == 'Admin' %}
-                    <div class="divider my-2 text-xs text-base-content/40">Admin</div>
+                    <div class="divider my-2 text-xs text-base-content/80">Admin</div>
                     <a href="{{ url_for('users') }}" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-base-content/80 hover:text-base-content {{ 'active' if request.endpoint in ['users', 'edit_user'] }}" data-testid="link-users">
                         <i class="fas fa-user-cog w-5 text-center"></i>
                         <span>Users</span>
