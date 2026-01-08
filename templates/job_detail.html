@@ -14,7 +14,7 @@
             <p class="text-base-content/60 mt-1">
                 <a href="{{ url_for('client_detail', client_id=job.client_id) }}" class="hover:text-primary">{{ job.client.name }}</a>
                 {% if job.is_retainer %}
-                <span class="badge badge-secondary badge-sm ml-2">
+                <span class="badge badge-secondary badge-sm rounded-md ml-2">
                     <i class="fas fa-sync-alt mr-1 text-xs"></i>
                     Retainer
                 </span>
@@ -22,7 +22,7 @@
             </p>
         </div>
         <div class="flex gap-2">
-            <span class="badge badge-lg {% if job.status == 'Active' %}badge-primary{% else %}badge-success{% endif %}">
+            <span class="badge badge-lg rounded-md {% if job.status == 'Active' %}badge-primary{% else %}badge-success{% endif %}">
                 {{ job.status }}
             </span>
             <button onclick="openTaskModal('add', {{ job.id }}, null, 'job_detail', '#job-kanban')" class="btn btn-primary gap-2" data-testid="button-add-deliverable">

@@ -18,7 +18,7 @@
             <div>
                 <h1 class="text-3xl font-bold" data-testid="text-client-name">{{ client.name }}</h1>
                 {% if client.industry %}
-                <span class="badge badge-ghost mt-1">{{ client.industry }}</span>
+                <span class="badge badge-ghost rounded-md mt-1">{{ client.industry }}</span>
                 {% endif %}
             </div>
         </div>
@@ -127,7 +127,7 @@
                    data-testid="link-deal-{{ deal.id }}">
                     <div class="flex items-center justify-between">
                         <span class="text-sm font-medium truncate">{{ deal.title }}</span>
-                        <span class="badge badge-sm 
+                        <span class="badge badge-sm rounded-md
                             {% if deal.stage == 'Won' %}badge-success
                             {% elif deal.stage == 'Lost' %}badge-error
                             {% else %}badge-ghost{% endif %}">

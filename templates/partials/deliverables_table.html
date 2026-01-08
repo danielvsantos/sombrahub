@@ -26,7 +26,7 @@
                 <td class="font-medium">{{ deliverable.title }}</td>
                 <td>
                     {% if deliverable.label %}
-                    <span class="badge badge-{{ deliverable.label.color }} badge-sm">{{ deliverable.label.name }}</span>
+                    <span class="badge badge-{{ deliverable.label.color }} badge-sm rounded-md">{{ deliverable.label.name }}</span>
                     {% else %}
                     <span class="text-base-content/40 text-sm">-</span>
                     {% endif %}

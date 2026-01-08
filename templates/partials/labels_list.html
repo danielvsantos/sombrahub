@@ -17,7 +17,7 @@
                     {% for label in labels %}
                     <tr data-testid="row-label-{{ label.id }}">
                         <td>
-                            <span class="badge badge-{{ label.color }}" data-testid="badge-label-{{ label.id }}">{{ label.name }}</span>
+                            <span class="badge badge-{{ label.color }} rounded-md" data-testid="badge-label-{{ label.id }}">{{ label.name }}</span>
                         </td>
                         <td class="capitalize">{{ label.color }}</td>
                         <td>{{ label.deliverables|length }}</td>

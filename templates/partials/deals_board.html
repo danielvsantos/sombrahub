@@ -12,7 +12,7 @@
                         {% else %}bg-error{% endif %}"></span>
                     {{ stage }}
                 </h3>
-                <span class="badge badge-ghost badge-sm" data-testid="badge-count-{{ stage|lower }}">{{ deals_by_stage[stage]|length }}</span>
+                <span class="badge badge-ghost badge-sm rounded-md" data-testid="badge-count-{{ stage|lower }}">{{ deals_by_stage[stage]|length }}</span>
             </div>
             
             <div class="space-y-3 deals-column min-h-32" id="column-{{ stage|lower }}" data-stage="{{ stage }}" data-testid="column-{{ stage|lower }}">
@@ -24,7 +24,7 @@
                     <div class="flex items-start justify-between gap-2 mb-2">
                         <span class="text-xs text-base-content/60 bg-base-300 px-2 py-0.5 rounded">{{ deal.client.name }}</span>
                         {% if deal.is_recurring %}
-                        <span class="badge badge-secondary badge-sm">
+                        <span class="badge badge-secondary badge-sm rounded-md">
                             <i class="fas fa-sync-alt mr-1 text-xs"></i>
                             Retainer
                         </span>

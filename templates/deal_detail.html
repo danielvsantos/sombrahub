@@ -152,7 +152,7 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="text-base-content/60 text-sm">Profit Margin</span>
-                        <span class="badge badge-lg font-semibold {% if deal.profit_margin >= 30 %}badge-success{% elif deal.profit_margin >= 15 %}badge-warning{% else %}badge-error{% endif %}">
+                        <span class="badge badge-lg rounded-md font-semibold {% if deal.profit_margin >= 30 %}badge-success{% elif deal.profit_margin >= 15 %}badge-warning{% else %}badge-error{% endif %}">
                             {{ "{:.1f}".format(deal.profit_margin) }}%
                         </span>
                     </div>
@@ -173,7 +173,7 @@
                     <a href="{{ url_for('job_detail', job_id=job.id) }}" class="block p-3 rounded-lg bg-base-300/50 hover:bg-base-300 transition-colors" data-testid="link-job-{{ job.id }}">
                         <div class="flex items-center justify-between">
                             <span class="font-medium">{{ job.display_title }}</span>
-                            <span class="badge badge-sm {% if job.status == 'Active' %}badge-primary{% else %}badge-success{% endif %}">
+                            <span class="badge badge-sm rounded-md {% if job.status == 'Active' %}badge-primary{% else %}badge-success{% endif %}">
                                 {{ job.status }}
                             </span>
                         </div>

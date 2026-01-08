@@ -42,7 +42,7 @@
                     <div class="flex items-center gap-2 mt-1">
                         <span class="text-sm text-base-content/60">{{ job.client.name }} - Started {{ job.start_date.strftime('%b %d, %Y') }}</span>
                         {% if job.is_retainer %}
-                        <span class="badge badge-secondary badge-sm">
+                        <span class="badge badge-secondary badge-sm rounded-md">
                             <i class="fas fa-sync-alt mr-1 text-xs"></i>
                             Retainer
                         </span>
@@ -56,7 +56,7 @@
                     <p class="text-sm text-base-content/60">Tasks</p>
                     <p class="font-semibold">{{ job.deliverables|length }} items</p>
                 </div>
-                <span class="badge 
+                <span class="badge rounded-md
                     {% if job.status == 'Active' %}badge-primary
                     {% else %}badge-success{% endif %}">
                     {{ job.status }}
