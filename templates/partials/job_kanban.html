@@ -44,11 +44,18 @@
                         <span class="text-base-content/40">Unassigned</span>
                         {% endif %}
                         
-                        {% if deliverable.due_date %}
-                        <span class="{% if deliverable.due_date < today %}text-error{% else %}text-base-content/60{% endif %}">
-                            {{ deliverable.due_date.strftime('%b %d') }}
-                        </span>
-                        {% endif %}
+                        <div class="flex items-center gap-2">
+                            {% if deliverable.file_name %}
+                            <a href="{{ url_for('get_deliverable_file', deliverable_id=deliverable.id) }}" class="text-primary hover:text-primary/80" title="File attached: {{ deliverable.file_original_name }}" target="_blank" data-testid="link-file-{{ deliverable.id }}">
+                                <i class="fas fa-paperclip"></i>
+                            </a>
+                            {% endif %}
+                            {% if deliverable.due_date %}
+                            <span class="{% if deliverable.due_date < today %}text-error{% else %}text-base-content/60{% endif %}">
+                                {{ deliverable.due_date.strftime('%b %d') }}
+                            </span>
+                            {% endif %}
+                        </div>
                     </div>
                     
                     <div class="flex items-center justify-between mt-2 pt-2 border-t border-base-300">

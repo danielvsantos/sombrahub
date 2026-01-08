@@ -16,6 +16,7 @@
                 <th>Status</th>
                 <th>Assignees</th>
                 <th>Due Date</th>
+                <th>File</th>
                 <th class="w-16"></th>
             </tr>
         </thead>
@@ -67,6 +68,15 @@
                     </span>
                     {% else %}
                     <span class="text-base-content/40 text-sm">No date</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if deliverable.file_name %}
+                    <a href="{{ url_for('get_deliverable_file', deliverable_id=deliverable.id) }}" class="btn btn-ghost btn-xs text-primary" title="{{ deliverable.file_original_name }}" target="_blank" data-testid="link-file-{{ deliverable.id }}">
+                        <i class="fas fa-paperclip"></i>
+                    </a>
+                    {% else %}
+                    <span class="text-base-content/40 text-sm">-</span>
                     {% endif %}
                 </td>
                 <td>
