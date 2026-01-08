@@ -773,6 +773,26 @@ def job_detail(job_id):
                          selected_label_id=selected_label_id)
 
 
+@app.route('/jobs/<int:job_id>/kanban')
+@login_required
+def job_kanban_partial(job_id):
+    """Return just the kanban partial for AJAX refresh after drag-drop"""
+    job = Job.query.get_or_404(job_id)
+    statuses = TASK_STATUSES
+    
+    selected_label_id = request.args.get('label_id', type=int)
+    
+    deliverables_by_status = {}
+    for status in statuses:
+        filtered = [d for d in job.deliverables if d.status == status]
+        if selected_label_id:
+            filtered = [d for d in filtered if d.label_id == selected_label_id]
+        deliverables_by_status[status] = filtered
+    
+    return render_template('partials/job_kanban.html', job=job, statuses=statuses, 
+                         deliverables_by_status=deliverables_by_status, today=date.today())
+
+
 @app.route('/jobs/<int:job_id>/add-deliverable', methods=['POST'])
 @login_required
 def add_deliverable(job_id):

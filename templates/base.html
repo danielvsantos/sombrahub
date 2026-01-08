@@ -403,10 +403,15 @@
         
         // Drag and Drop for Kanban
         let draggedCard = null;
+        let kanbanDragDropInitialized = false;
         
         function initKanbanDragDrop() {
             const kanbanContainer = document.getElementById('job-kanban');
             if (!kanbanContainer) return;
+            
+            // Prevent duplicate listeners
+            if (kanbanContainer.dataset.dragDropInit === 'true') return;
+            kanbanContainer.dataset.dragDropInit = 'true';
             
             // Use event delegation for drag events
             kanbanContainer.addEventListener('dragstart', function(e) {
@@ -471,10 +476,20 @@
                             });
                             
                             if (response.ok) {
-                                // Refresh the kanban via HTMX
-                                htmx.trigger('#job-kanban', 'refresh');
+                                // Refresh the kanban by reloading partial
                                 const jobId = draggedCard.dataset.jobId;
-                                htmx.ajax('GET', '/jobs/' + jobId, {target: '#job-kanban', select: '#job-kanban > *', swap: 'innerHTML'});
+                                const labelId = new URLSearchParams(window.location.search).get('label_id');
+                                let url = '/jobs/' + jobId + '/kanban';
+                                if (labelId) url += '?label_id=' + labelId;
+                                
+                                const kanbanResponse = await fetch(url);
+                                if (kanbanResponse.ok) {
+                                    const html = await kanbanResponse.text();
+                                    kanbanContainer.innerHTML = html;
+                                    // Reset init flag so events work on new content
+                                    kanbanContainer.dataset.dragDropInit = 'false';
+                                    initKanbanDragDrop();
+                                }
                             }
                         } catch (error) {
                             console.error('Failed to update task status:', error);
@@ -488,6 +503,8 @@
         // Re-init after HTMX swaps
         document.body.addEventListener('htmx:afterSwap', function(e) {
             if (e.target.id === 'job-kanban') {
+                const container = document.getElementById('job-kanban');
+                if (container) container.dataset.dragDropInit = 'false';
                 initKanbanDragDrop();
             }
         });
