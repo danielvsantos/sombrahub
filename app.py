@@ -1,9 +1,11 @@
 import os
 from functools import wraps
-from flask import Flask, render_template, redirect, url_for, request, flash, jsonify, abort
+import uuid
+from flask import Flask, render_template, redirect, url_for, request, flash, jsonify, abort, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 from datetime import datetime, date, timedelta
 import calendar
 
@@ -25,6 +27,16 @@ app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
     'pool_pre_ping': True,
     'pool_recycle': 300,
 }
+
+# File upload configuration
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'pdf', 'doc', 'docx', 'xls', 'xlsx', 'txt', 'zip', 'psd', 'ai', 'mp4', 'mov'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 db = SQLAlchemy(app)
 
@@ -164,6 +176,8 @@ class Deliverable(db.Model):
     assignee_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     due_date = db.Column(db.Date, nullable=True)
     label_id = db.Column(db.Integer, db.ForeignKey('label.id'), nullable=True)
+    file_name = db.Column(db.String(255), nullable=True)
+    file_original_name = db.Column(db.String(255), nullable=True)
     
     label = db.relationship('Label', backref='deliverables')
     task_assignments = db.relationship('TaskAssignment', backref='task', lazy=True, cascade='all, delete-orphan')
@@ -175,6 +189,16 @@ class Deliverable(db.Model):
         if self.assignee and self.assignee not in assignees:
             assignees.insert(0, self.assignee)
         return assignees
+    
+    @property
+    def has_file(self):
+        return self.file_name is not None and self.file_name != ''
+    
+    @property
+    def file_extension(self):
+        if self.file_original_name:
+            return self.file_original_name.rsplit('.', 1)[-1].lower() if '.' in self.file_original_name else ''
+        return ''
 
 
 class TaskAssignment(db.Model):
