@@ -454,11 +454,17 @@
                     const actionUrl = taskForm.dataset.actionUrl || taskForm.action;
                     const htmxTarget = taskForm.dataset.htmxTarget || '#job-kanban';
                     
+                    console.log('Submitting to:', actionUrl);
+                    console.log('Target:', htmxTarget);
+                    
                     fetch(actionUrl, {
                         method: 'POST',
                         body: formData
                     })
-                    .then(response => response.text())
+                    .then(response => {
+                        console.log('Response status:', response.status);
+                        return response.text();
+                    })
                     .then(html => {
                         const targetEl = document.querySelector(htmxTarget);
                         if (targetEl) {
@@ -470,6 +476,20 @@
                     .catch(error => {
                         console.error('Form submission error:', error);
                     });
+                });
+            }
+            
+            // Also attach click handler to submit button as fallback
+            const submitBtn = document.getElementById('task-submit-btn');
+            if (submitBtn) {
+                submitBtn.addEventListener('click', function(event) {
+                    console.log('Submit button clicked');
+                    const form = document.getElementById('task-form');
+                    if (form) {
+                        // Manually trigger form submission
+                        const submitEvent = new Event('submit', { bubbles: true, cancelable: true });
+                        form.dispatchEvent(submitEvent);
+                    }
                 });
             }
         });
