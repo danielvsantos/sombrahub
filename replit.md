@@ -47,7 +47,9 @@ Sombra Hub is a full-stack web application for managing Sombra Lab's sales and p
    - Click on job title to view detailed job page with kanban
 
 5. **Job Detail Page**
-   - Kanban view of tasks organized by status
+   - Kanban view of tasks organized by status (full-width at top, info panels below)
+   - **Drag-and-Drop**: Move tasks between status columns with native HTML5 drag-and-drop
+   - **Label Filtering**: Filter tasks by label via dropdown
    - Add/edit/delete tasks with HTMX and unified modal
    - Team assignment management
    - View linked deal information
@@ -67,11 +69,15 @@ Sombra Hub is a full-stack web application for managing Sombra Lab's sales and p
    - Click to view detailed client page
 
 8. **Client Detail Page**
-   - Full contact information display
+   - Full-width kanban view of all tasks across all client jobs (at top)
+   - Contact Info, Stats, and Deals summary boxes in 3-column grid below
    - Stats overview (total deals, active jobs, total value)
    - Related deals list with links
-   - Kanban view of all tasks across all client jobs
    - Edit client information
+
+9. **Dashboard (Role-Based)**
+   - Admin users see full statistics (Total Deals, Active Jobs, Pending Tasks, Won Deals Value)
+   - Photographers see only "My Tasks" section and quick links
 
 ## Database Models
 
@@ -205,7 +211,4 @@ Replit provides point-in-time restore for production databases if you need to re
 ## Pending Features
 
 - Multi-assignee support for tasks
-- File upload capability for tasks
-- Labels/tags system with admin management
-- Role-based access control for clients/deals (admin only)
-- Drag-and-drop for kanban task management
+- Labels/tags admin management UI
