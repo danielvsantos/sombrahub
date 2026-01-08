@@ -943,6 +943,86 @@ def delete_deliverable(deliverable_id):
     return redirect(url_for('production'))
 
 
+@app.route('/deliverables/<int:deliverable_id>/upload', methods=['POST'])
+@login_required
+def upload_file_to_deliverable(deliverable_id):
+    deliverable = Deliverable.query.get_or_404(deliverable_id)
+    redirect_to = request.form.get('redirect_to', 'production')
+    
+    if 'file' not in request.files:
+        flash('No file selected.', 'error')
+        return redirect(request.referrer or url_for('production'))
+    
+    file = request.files['file']
+    
+    if file.filename == '':
+        flash('No file selected.', 'error')
+        return redirect(request.referrer or url_for('production'))
+    
+    if file and allowed_file(file.filename):
+        original_filename = secure_filename(file.filename)
+        ext = original_filename.rsplit('.', 1)[1].lower() if '.' in original_filename else ''
+        unique_filename = f"{uuid.uuid4().hex}_{deliverable_id}.{ext}" if ext else f"{uuid.uuid4().hex}_{deliverable_id}"
+        
+        if deliverable.file_name:
+            old_file_path = os.path.join(app.config['UPLOAD_FOLDER'], deliverable.file_name)
+            if os.path.exists(old_file_path):
+                os.remove(old_file_path)
+        
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], unique_filename))
+        
+        deliverable.file_name = unique_filename
+        deliverable.file_original_name = file.filename
+        db.session.commit()
+        
+        flash(f'File "{file.filename}" uploaded successfully.', 'success')
+    else:
+        flash('Invalid file type.', 'error')
+    
+    if redirect_to == 'job_detail':
+        return redirect(url_for('job_detail', job_id=deliverable.job_id))
+    return redirect(url_for('production'))
+
+
+@app.route('/deliverables/<int:deliverable_id>/file')
+@login_required
+def download_file(deliverable_id):
+    deliverable = Deliverable.query.get_or_404(deliverable_id)
+    
+    if not deliverable.file_name:
+        flash('No file attached to this task.', 'error')
+        return redirect(request.referrer or url_for('production'))
+    
+    return send_from_directory(
+        app.config['UPLOAD_FOLDER'],
+        deliverable.file_name,
+        as_attachment=True,
+        download_name=deliverable.file_original_name
+    )
+
+
+@app.route('/deliverables/<int:deliverable_id>/file/delete', methods=['POST'])
+@login_required
+def delete_file(deliverable_id):
+    deliverable = Deliverable.query.get_or_404(deliverable_id)
+    redirect_to = request.form.get('redirect_to', 'production')
+    
+    if deliverable.file_name:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], deliverable.file_name)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+        
+        deliverable.file_name = None
+        deliverable.file_original_name = None
+        db.session.commit()
+        
+        flash('File removed.', 'info')
+    
+    if redirect_to == 'job_detail':
+        return redirect(url_for('job_detail', job_id=deliverable.job_id))
+    return redirect(url_for('production'))
+
+
 @app.route('/jobs/<int:job_id>/complete', methods=['POST'])
 @login_required
 def complete_job(job_id):
