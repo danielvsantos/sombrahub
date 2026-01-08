@@ -295,6 +295,11 @@
             document.getElementById('task-redirect-to').value = redirectTo;
             document.getElementById('task-job-id').value = jobId;
             
+            const fileSection = document.getElementById('task-file-section');
+            const fileDisplay = document.getElementById('task-file-display');
+            const fileUploadForm = document.getElementById('task-file-upload-form');
+            const fileDeleteForm = document.getElementById('task-file-delete-form');
+            
             if (mode === 'add') {
                 iconEl.className = 'fas fa-plus-circle text-blue-400';
                 headingEl.textContent = 'Add Task';
@@ -308,6 +313,8 @@
                 document.getElementById('task-due-date').value = '';
                 document.getElementById('task-label').value = '';
                 assigneesContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
+                
+                fileSection.classList.add('hidden');
             } else if (mode === 'edit' && taskData) {
                 iconEl.className = 'fas fa-edit text-blue-400';
                 headingEl.textContent = 'Edit Task';
@@ -325,6 +332,36 @@
                 assigneesContainer.querySelectorAll('input[type="checkbox"]').forEach(cb => {
                     cb.checked = selectedIds.includes(parseInt(cb.value));
                 });
+                
+                fileSection.classList.remove('hidden');
+                fileUploadForm.action = '/deliverables/' + taskData.id + '/upload';
+                fileDeleteForm.action = '/deliverables/' + taskData.id + '/file/delete';
+                
+                if (taskData.file_name && taskData.file_original_name) {
+                    fileDisplay.classList.remove('hidden');
+                    document.getElementById('task-file-name').textContent = taskData.file_original_name;
+                    document.getElementById('task-file-link').href = '/deliverables/' + taskData.id + '/file';
+                    
+                    const ext = taskData.file_original_name.split('.').pop().toLowerCase();
+                    const fileIcon = document.getElementById('task-file-icon');
+                    if (['jpg', 'jpeg', 'png', 'gif'].includes(ext)) {
+                        fileIcon.className = 'fas fa-file-image text-lg text-primary';
+                    } else if (ext === 'pdf') {
+                        fileIcon.className = 'fas fa-file-pdf text-lg text-error';
+                    } else if (['doc', 'docx'].includes(ext)) {
+                        fileIcon.className = 'fas fa-file-word text-lg text-info';
+                    } else if (['xls', 'xlsx'].includes(ext)) {
+                        fileIcon.className = 'fas fa-file-excel text-lg text-success';
+                    } else if (['mp4', 'mov'].includes(ext)) {
+                        fileIcon.className = 'fas fa-file-video text-lg text-warning';
+                    } else if (['psd', 'ai'].includes(ext)) {
+                        fileIcon.className = 'fas fa-file-alt text-lg text-secondary';
+                    } else {
+                        fileIcon.className = 'fas fa-file text-lg text-primary';
+                    }
+                } else {
+                    fileDisplay.classList.add('hidden');
+                }
             }
             
             form.setAttribute('hx-target', htmxTarget);

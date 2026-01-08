@@ -836,7 +836,9 @@ def get_deliverable_json(deliverable_id):
         'assignee_id': deliverable.assignee_id,
         'assignee_ids': assignee_ids,
         'label_id': deliverable.label_id,
-        'due_date': deliverable.due_date.strftime('%Y-%m-%d') if deliverable.due_date else ''
+        'due_date': deliverable.due_date.strftime('%Y-%m-%d') if deliverable.due_date else '',
+        'file_name': deliverable.file_name or '',
+        'file_original_name': deliverable.file_original_name or ''
     })
 
 
